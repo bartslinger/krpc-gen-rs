@@ -20,7 +20,9 @@ struct Procedure {
     id: u64,
     parameters: Vec<Parameter>,
     game_scenes: Option<Vec<GameScene>>,
-    return_type: Option<Type>,
+    return_type: Option<ReturnType>,
+    return_is_nullable: Option<bool>,
+    // documentation: String,
 }
 
 #[derive(Deserialize, Debug)]
@@ -32,7 +34,14 @@ struct Parameter {
 #[derive(Deserialize, Debug)]
 struct Type {
     code: Code,
+}
+
+#[derive(Deserialize, Debug)]
+struct ReturnType {
+    code: Code,
     types: Option<Vec<Type>>,
+    service: Option<String>,
+    name: Option<String>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -65,7 +74,9 @@ pub fn generate_for(path: &str) {
 
     let v: FileStructure = serde_json::from_reader(reader).unwrap();
 
-    for proc in v.space_center.procedures {
+    for proc in &v.space_center.procedures {
         println!("{:?}", proc.0);
     }
+    
+    println!("{:?}", v.space_center.procedures["get_ActiveVessel"]);
 }
