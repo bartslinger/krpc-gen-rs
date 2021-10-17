@@ -10,13 +10,13 @@ struct FileStructure {
     space_center: Content,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 struct Content {
     id: u64,
     procedures: HashMap<String, Procedure>,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 struct Procedure {
     id: u64,
     parameters: Vec<Parameter>,
@@ -26,18 +26,18 @@ struct Procedure {
     // documentation: String,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 struct Parameter {
     name: String,
     r#type: Type,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 struct Type {
     code: Code,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 struct ReturnType {
     code: Code,
     types: Option<Vec<Type>>,
@@ -45,7 +45,7 @@ struct ReturnType {
     name: Option<String>,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "UPPERCASE")]
 enum Code {
     String,
@@ -62,7 +62,7 @@ enum Code {
     Class,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "UPPERCASE")]
 enum GameScene {
     Flight,
@@ -103,6 +103,13 @@ enum ProcedureType {
     ClassPropertyGetter(ClassProperty),
     ClassPropertySetter(ClassProperty),
     Unknown,
+}
+
+#[derive(Debug)]
+pub struct Class {
+    methods: Vec<String>,
+    getters: HashMap<String, Procedure>,
+    setters: Vec<String>,
 }
 
 fn get_procedure_type(procedure_name: &str) -> ProcedureType {
@@ -168,10 +175,63 @@ pub fn generate_for(path: &str) {
 
     let v: FileStructure = serde_json::from_reader(reader).unwrap();
 
+    let mut classes = HashMap::<String, Class>::new();
     for proc in &v.space_center.procedures {
         // println!("{:?}", proc.0);
         let procedure_type = get_procedure_type(proc.0);
+
+        match procedure_type {
+            ProcedureType::ClassMethod(x) => {
+                match classes.get_mut(&x.class) {
+                    Some(class) => {
+                        class.methods.push(x.method);
+                    },
+                    None => {
+                        classes.insert(x.class, Class {
+                            methods: vec![x.method],
+                            getters: HashMap::new(),
+                            setters: vec![],
+                        });
+                    }
+                }
+            },
+            ProcedureType::ClassPropertyGetter(x) => {
+                match classes.get_mut(&x.class) {
+                    Some(class) => {
+                        class.getters.insert(x.property, (proc.1).clone());
+                    },
+                    None => {
+                        let mut map = HashMap::new();
+                        map.insert(x.property, (proc.1).clone());
+                        classes.insert(x.class, Class {
+                            methods: vec![],
+                            getters: map,
+                            setters: vec![],
+                        });
+                    }
+                }
+            },
+            ProcedureType::ClassPropertySetter(x) => {
+                match classes.get_mut(&x.class) {
+                    Some(class) => {
+                        class.setters.push(x.property);
+                    },
+                    None => {
+                        classes.insert(x.class, Class {
+                            methods: vec![],
+                            getters: HashMap::new(),
+                            setters: vec![x.property],
+                        });
+                    }
+                }
+            },
+            _ => {}
+        }
         // println!("{:?}", procedure_type);
+    }
+    
+    for (getter, procedure) in &classes["Vessel"].getters {
+        println!("{:?}: {:?}", getter, procedure);
     }
     
     // println!("{:?}", v.space_center.procedures["get_ActiveVessel"]);
