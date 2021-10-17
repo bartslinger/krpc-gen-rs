@@ -7,7 +7,7 @@ pub fn generate_for(path: &str) {
 
     let output_structure = parser::create_output_structure(&input_structure);
    
-    for (getter, procedure) in &output_structure.classes["Vessel"].getters {
+    for (getter, procedure) in &output_structure.classes["Orbit"].static_methods {
         println!("{:?}: {:?}", getter, procedure);
     }
     

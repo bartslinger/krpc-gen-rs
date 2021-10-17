@@ -37,14 +37,18 @@ enum ProcedureType {
 }
 
 pub struct OutputStructure {
+    pub methods: HashMap<String, original::Procedure>,
+    pub getters: HashMap<String, original::Procedure>,
+    pub setters: HashMap<String, original::Procedure>,
     pub classes: HashMap<String, Class>,
 }
 
 #[derive(Debug)]
 pub struct Class {
-    pub methods: Vec<String>,
+    pub methods: HashMap<String, original::Procedure>,
     pub getters: HashMap<String, original::Procedure>,
-    pub setters: Vec<String>,
+    pub setters: HashMap<String, original::Procedure>,
+    pub static_methods: HashMap<String, original::Procedure>,
 }
 
 fn get_procedure_type(procedure_name: &str) -> ProcedureType {
@@ -104,63 +108,60 @@ fn get_procedure_type(procedure_name: &str) -> ProcedureType {
 }
 
 pub fn create_output_structure(input_structure: &original::FileStructure) -> OutputStructure {
+    let mut service_methods = HashMap::<String, original::Procedure>::new();
+    let mut service_getters = HashMap::<String, original::Procedure>::new();
+    let mut service_setters = HashMap::<String, original::Procedure>::new();
     let mut classes = HashMap::<String, Class>::new();
     for proc in &input_structure.space_center.procedures {
-        // println!("{:?}", proc.0);
         let procedure_type = get_procedure_type(proc.0);
-
         match procedure_type {
+            ProcedureType::Standard(x) => {
+                service_methods.insert(x.name, (proc.1).clone());
+            },
+            ProcedureType::PropertyGetter(x) => {
+                service_getters.insert(x.name, (proc.1).clone());
+            },
+            ProcedureType::PropertySetter(x) => {
+                service_setters.insert(x.name, (proc.1).clone());
+            },
             ProcedureType::ClassMethod(x) => {
-                match classes.get_mut(&x.class) {
-                    Some(class) => {
-                        class.methods.push(x.method);
-                    },
-                    None => {
-                        classes.insert(x.class, Class {
-                            methods: vec![x.method],
-                            getters: HashMap::new(),
-                            setters: vec![],
-                        });
-                    }
-                }
+                add_class_if_nonexistent(&mut classes, &x.class);
+                classes.get_mut(&x.class).unwrap().methods.insert(x.method, (proc.1).clone());
             },
             ProcedureType::ClassPropertyGetter(x) => {
-                match classes.get_mut(&x.class) {
-                    Some(class) => {
-                        class.getters.insert(x.property, (proc.1).clone());
-                    },
-                    None => {
-                        let mut map = HashMap::new();
-                        map.insert(x.property, (proc.1).clone());
-                        classes.insert(x.class, Class {
-                            methods: vec![],
-                            getters: map,
-                            setters: vec![],
-                        });
-                    }
-                }
+                add_class_if_nonexistent(&mut classes, &x.class);
+                classes.get_mut(&x.class).unwrap().getters.insert(x.property, (proc.1).clone());
             },
             ProcedureType::ClassPropertySetter(x) => {
-                match classes.get_mut(&x.class) {
-                    Some(class) => {
-                        class.setters.push(x.property);
-                    },
-                    None => {
-                        classes.insert(x.class, Class {
-                            methods: vec![],
-                            getters: HashMap::new(),
-                            setters: vec![x.property],
-                        });
-                    }
-                }
+                add_class_if_nonexistent(&mut classes, &x.class);
+                classes.get_mut(&x.class).unwrap().setters.insert(x.property, (proc.1).clone());
             },
-            _ => {}
+            ProcedureType::StaticClassMethod(x) => {
+                add_class_if_nonexistent(&mut classes, &x.class);
+                classes.get_mut(&x.class).unwrap().static_methods.insert(x.method, (proc.1).clone());
+            },
+            ProcedureType::Unknown => {}
         }
     }
     
     OutputStructure {
+        methods: service_methods,
+        getters: service_getters,
+        setters: service_setters,
         classes: classes,
     }
+}
+
+fn add_class_if_nonexistent(classes: &mut HashMap<String, Class>, class_name: &String) {
+    if let None = classes.get(class_name) {
+        classes.insert(class_name.clone(), Class {
+            methods: HashMap::new(),
+            getters: HashMap::new(),
+            setters: HashMap::new(),
+            static_methods: HashMap::new(),
+        });
+    }
+
 }
 
 #[cfg(test)]
