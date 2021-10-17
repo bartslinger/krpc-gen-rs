@@ -15,9 +15,10 @@ impl<'s> {{ service_name }}<'s> {
             conn
         }
     }
-    {{#each service_getters }}
+    {{#each service_getters as |getter|}}
     
-    pub async fn {{ name }}(&'s self) -> Result<{{ return_type }}, Error> {
+    pub async fn {{ name }}(&'s self) -> Result<{{ return_type getter.return_type }}, Error> {
+
     }
     {{/each}}
 }

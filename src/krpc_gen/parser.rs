@@ -156,7 +156,7 @@ fn convert_to_function(procedure_type: &ProcedureType, procedure: &original::Pro
         Some(t) => {
             match t.code {
                 original::Code::Class => {
-                    output::ReturnType::Class(t.name.clone().unwrap())
+                    output::ReturnType::Class{ name: t.name.clone().unwrap()}
                 },
                 _ => output::ReturnType::Empty
             }

@@ -1,7 +1,6 @@
 mod original;
 mod parser;
 mod writer;
-mod conversion;
 mod output;
 
 pub fn generate_for(path: &str) {

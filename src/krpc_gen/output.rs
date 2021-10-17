@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use serde::Serialize;
 use crate::original;
 
 pub struct OutputStructure {
@@ -16,16 +17,17 @@ pub struct Class {
     pub static_methods: HashMap<String, original::Procedure>,
 }
 
-#[derive(Debug, Default)]
+#[derive(Serialize, Debug, Clone, Default)]
 pub struct Function {
     pub name: String,
     pub return_type: ReturnType,
 }
 
-#[derive(Debug)]
+#[derive(Serialize, Debug, Clone)]
+#[serde(tag = "type")]
 pub enum ReturnType {
     Empty,
-    Class(String),
+    Class {name: String},
     // Float,
     // Double,
     // Tuple,
