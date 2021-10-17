@@ -25,7 +25,7 @@ pub struct Function {
 #[derive(Debug)]
 pub enum ReturnType {
     Empty,
-    // Class(Class),
+    Class(String),
     // Float,
     // Double,
     // Tuple,

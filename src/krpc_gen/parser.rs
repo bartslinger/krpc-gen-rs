@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use regex::Regex;
+use convert_case::{Case, Casing};
 use crate::original;
 use crate::output;
 
@@ -100,31 +101,31 @@ pub fn create_output_structure(input_structure: &original::Content) -> output::O
     let mut classes = HashMap::<String, output::Class>::new();
     for proc in &input_structure.procedures {
         let procedure_type = get_procedure_type(proc.0);
-        match procedure_type {
+        match &procedure_type {
             ProcedureType::Standard(x) => {
-                service_methods.insert(x.name, (proc.1).clone());
+                service_methods.insert(x.name.clone(), (proc.1).clone());
             },
             ProcedureType::PropertyGetter(x) => {
-                service_getters.insert(x.name, output::Function::default());
+                service_getters.insert(x.name.clone(), convert_to_function(&procedure_type, &proc.1));
             },
             ProcedureType::PropertySetter(x) => {
-                service_setters.insert(x.name, (proc.1).clone());
+                service_setters.insert(x.name.clone(), (proc.1).clone());
             },
             ProcedureType::ClassMethod(x) => {
                 add_class_if_nonexistent(&mut classes, &x.class);
-                classes.get_mut(&x.class).unwrap().methods.insert(x.method, (proc.1).clone());
+                classes.get_mut(&x.class).unwrap().methods.insert(x.method.clone(), (proc.1).clone());
             },
             ProcedureType::ClassPropertyGetter(x) => {
                 add_class_if_nonexistent(&mut classes, &x.class);
-                classes.get_mut(&x.class).unwrap().getters.insert(x.property, (proc.1).clone());
+                classes.get_mut(&x.class).unwrap().getters.insert(x.property.clone(), (proc.1).clone());
             },
             ProcedureType::ClassPropertySetter(x) => {
                 add_class_if_nonexistent(&mut classes, &x.class);
-                classes.get_mut(&x.class).unwrap().setters.insert(x.property, (proc.1).clone());
+                classes.get_mut(&x.class).unwrap().setters.insert(x.property.clone(), (proc.1).clone());
             },
             ProcedureType::StaticClassMethod(x) => {
                 add_class_if_nonexistent(&mut classes, &x.class);
-                classes.get_mut(&x.class).unwrap().static_methods.insert(x.method, (proc.1).clone());
+                classes.get_mut(&x.class).unwrap().static_methods.insert(x.method.clone(), (proc.1).clone());
             },
             ProcedureType::Unknown => {}
         }
@@ -150,20 +151,32 @@ fn add_class_if_nonexistent(classes: &mut HashMap<String, output::Class>, class_
 
 }
 
-fn convert_to_function(_procedure_type: &ProcedureType, procedure: &original::Procedure) -> output::Function {
+fn convert_to_function(procedure_type: &ProcedureType, procedure: &original::Procedure) -> output::Function {
     let return_type = match &procedure.return_type {
         Some(t) => {
             match t.code {
                 original::Code::Class => {
-                    output::ReturnType::Empty
+                    output::ReturnType::Class(t.name.clone().unwrap())
                 },
                 _ => output::ReturnType::Empty
             }
         },
         None => output::ReturnType::Empty,
     };
+    
+    let function_name = match &procedure_type {
+        ProcedureType::Standard(x) => x.name.to_case(Case::Snake),
+        ProcedureType::PropertyGetter(x) => "get_".to_string() + x.name.to_case(Case::Snake).as_str(),
+        ProcedureType::PropertySetter(x) => "set_".to_string() + x.name.to_case(Case::Snake).as_str(),
+        ProcedureType::ClassMethod(x) => x.method.to_case(Case::Snake),
+        ProcedureType::ClassPropertyGetter(x) => "get_".to_string() + x.class.to_case(Case::Snake).as_str(),
+        ProcedureType::ClassPropertySetter(x) => "set_".to_string() + x.class.to_case(Case::Snake).as_str(),
+        ProcedureType::StaticClassMethod(x) => x.method.to_case(Case::Snake),
+        ProcedureType::Unknown => "".to_string(),
+    };
+
     output::Function {
-        name: "".to_string(),
+        name: function_name,
         return_type,
     }
 }
