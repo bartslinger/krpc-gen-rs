@@ -14,7 +14,7 @@ pub struct Procedure {
     id: u64,
     parameters: Vec<Parameter>,
     game_scenes: Option<Vec<GameScene>>,
-    return_type: Option<ReturnType>,
+    pub return_type: Option<ReturnType>,
     return_is_nullable: Option<bool>,
     // documentation: String,
 }
@@ -26,21 +26,21 @@ struct Parameter {
 }
 
 #[derive(Deserialize, Debug, Clone)]
-struct Type {
+pub struct Type {
     code: Code,
 }
 
 #[derive(Deserialize, Debug, Clone)]
-struct ReturnType {
-    code: Code,
-    types: Option<Vec<Type>>,
+pub struct ReturnType {
+    pub code: Code,
+    pub types: Option<Vec<Type>>,
     service: Option<String>,
-    name: Option<String>,
+    pub name: Option<String>,
 }
 
 #[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "UPPERCASE")]
-enum Code {
+pub enum Code {
     String,
     Bool,
     Float,

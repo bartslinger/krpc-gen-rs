@@ -1,0 +1,23 @@
+// Generated file DO NOT EDIT
+use crate::connection;
+use crate::connection::Connection;
+use crate::decoder;
+use crate::encoder;
+
+use super::schema;
+
+pub struct {{ service_name }}<'s> {
+    conn: &'s Connection,
+}
+impl<'s> {{ service_name }}<'s> {
+    pub fn new(conn: &'s Connection) -> {{ service_name }}<'s> {
+        {{ service_name }}<'s> {
+            conn
+        }
+    }
+    {{#each service_getters }}
+    
+    pub async fn {{ name }}(&'s self) -> Result<{{ return_type }}, Error> {
+    }
+    {{/each}}
+}

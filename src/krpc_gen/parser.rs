@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use regex::Regex;
 use crate::original;
+use crate::output;
 
 #[derive(PartialEq, Debug)]
 struct ServiceMethod {
@@ -34,21 +35,6 @@ enum ProcedureType {
     ClassPropertyGetter(ClassProperty),
     ClassPropertySetter(ClassProperty),
     Unknown,
-}
-
-pub struct OutputStructure {
-    pub methods: HashMap<String, original::Procedure>,
-    pub getters: HashMap<String, original::Procedure>,
-    pub setters: HashMap<String, original::Procedure>,
-    pub classes: HashMap<String, Class>,
-}
-
-#[derive(Debug)]
-pub struct Class {
-    pub methods: HashMap<String, original::Procedure>,
-    pub getters: HashMap<String, original::Procedure>,
-    pub setters: HashMap<String, original::Procedure>,
-    pub static_methods: HashMap<String, original::Procedure>,
 }
 
 fn get_procedure_type(procedure_name: &str) -> ProcedureType {
@@ -107,11 +93,11 @@ fn get_procedure_type(procedure_name: &str) -> ProcedureType {
     })
 }
 
-pub fn create_output_structure(input_structure: &original::Content) -> OutputStructure {
+pub fn create_output_structure(input_structure: &original::Content) -> output::OutputStructure {
     let mut service_methods = HashMap::<String, original::Procedure>::new();
-    let mut service_getters = HashMap::<String, original::Procedure>::new();
+    let mut service_getters = HashMap::<String, output::Function>::new();
     let mut service_setters = HashMap::<String, original::Procedure>::new();
-    let mut classes = HashMap::<String, Class>::new();
+    let mut classes = HashMap::<String, output::Class>::new();
     for proc in &input_structure.procedures {
         let procedure_type = get_procedure_type(proc.0);
         match procedure_type {
@@ -119,7 +105,7 @@ pub fn create_output_structure(input_structure: &original::Content) -> OutputStr
                 service_methods.insert(x.name, (proc.1).clone());
             },
             ProcedureType::PropertyGetter(x) => {
-                service_getters.insert(x.name, (proc.1).clone());
+                service_getters.insert(x.name, output::Function::default());
             },
             ProcedureType::PropertySetter(x) => {
                 service_setters.insert(x.name, (proc.1).clone());
@@ -144,7 +130,7 @@ pub fn create_output_structure(input_structure: &original::Content) -> OutputStr
         }
     }
     
-    OutputStructure {
+    output::OutputStructure {
         methods: service_methods,
         getters: service_getters,
         setters: service_setters,
@@ -152,9 +138,9 @@ pub fn create_output_structure(input_structure: &original::Content) -> OutputStr
     }
 }
 
-fn add_class_if_nonexistent(classes: &mut HashMap<String, Class>, class_name: &String) {
+fn add_class_if_nonexistent(classes: &mut HashMap<String, output::Class>, class_name: &String) {
     if let None = classes.get(class_name) {
-        classes.insert(class_name.clone(), Class {
+        classes.insert(class_name.clone(), output::Class {
             methods: HashMap::new(),
             getters: HashMap::new(),
             setters: HashMap::new(),
@@ -162,6 +148,24 @@ fn add_class_if_nonexistent(classes: &mut HashMap<String, Class>, class_name: &S
         });
     }
 
+}
+
+fn convert_to_function(_procedure_type: &ProcedureType, procedure: &original::Procedure) -> output::Function {
+    let return_type = match &procedure.return_type {
+        Some(t) => {
+            match t.code {
+                original::Code::Class => {
+                    output::ReturnType::Empty
+                },
+                _ => output::ReturnType::Empty
+            }
+        },
+        None => output::ReturnType::Empty,
+    };
+    output::Function {
+        name: "".to_string(),
+        return_type,
+    }
 }
 
 #[cfg(test)]
