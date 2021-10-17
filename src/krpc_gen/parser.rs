@@ -107,12 +107,12 @@ fn get_procedure_type(procedure_name: &str) -> ProcedureType {
     })
 }
 
-pub fn create_output_structure(input_structure: &original::FileStructure) -> OutputStructure {
+pub fn create_output_structure(input_structure: &original::Content) -> OutputStructure {
     let mut service_methods = HashMap::<String, original::Procedure>::new();
     let mut service_getters = HashMap::<String, original::Procedure>::new();
     let mut service_setters = HashMap::<String, original::Procedure>::new();
     let mut classes = HashMap::<String, Class>::new();
-    for proc in &input_structure.space_center.procedures {
+    for proc in &input_structure.procedures {
         let procedure_type = get_procedure_type(proc.0);
         match procedure_type {
             ProcedureType::Standard(x) => {

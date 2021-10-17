@@ -3,12 +3,6 @@ use std::io::BufReader;
 use std::collections::HashMap;
 use serde::Deserialize;
 
-#[derive(Deserialize, Debug)]
-pub struct FileStructure {
-    #[serde(rename = "SpaceCenter")]
-    pub space_center: Content,
-}
-
 #[derive(Deserialize, Debug, Clone)]
 pub struct Content {
     id: u64,
@@ -67,11 +61,11 @@ enum GameScene {
     Flight,
 }
 
-pub fn deserialize_from_file(path: &str) -> FileStructure {
+pub fn deserialize_from_file(path: &str) -> HashMap<String, Content> {
     let file = File::open(path).unwrap();
     let reader = BufReader::new(file);
 
-    let v: FileStructure = serde_json::from_reader(reader).unwrap();
+    let v: HashMap<String, Content> = serde_json::from_reader(reader).unwrap();
 
     v
 }

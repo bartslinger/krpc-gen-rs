@@ -5,7 +5,7 @@ pub fn generate_for(path: &str) {
 
     let input_structure = original::deserialize_from_file(path);
 
-    let output_structure = parser::create_output_structure(&input_structure);
+    let output_structure = parser::create_output_structure(&input_structure["SpaceCenter"]);
    
     for (getter, procedure) in &output_structure.classes["Orbit"].static_methods {
         println!("{:?}: {:?}", getter, procedure);
