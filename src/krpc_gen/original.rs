@@ -11,7 +11,7 @@ pub struct Content {
 
 #[derive(Deserialize, Debug, Clone)]
 pub struct Procedure {
-    id: u64,
+    pub id: u64,
     parameters: Vec<Parameter>,
     game_scenes: Option<Vec<GameScene>>,
     pub return_type: Option<ReturnType>,

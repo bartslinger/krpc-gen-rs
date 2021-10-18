@@ -12,7 +12,7 @@ pub fn generate_for(path: &str) {
     // for (getter, procedure) in &output_structure.getters {
     //     println!("{:?}: {:?}", getter, procedure);
     // }
-    println!("{:?}", &output_structure.getters["ActiveVessel"]);
+    // println!("{:?}", &output_structure.getters);
     
     writer::write_to_file("SpaceCenter", "output/space_center.rs", &output_structure);
     

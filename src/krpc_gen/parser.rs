@@ -5,7 +5,7 @@ use crate::original;
 use crate::output;
 
 #[derive(PartialEq, Debug)]
-struct ServiceMethod {
+struct StandardMethod {
     name: String,    
 }
 
@@ -28,7 +28,7 @@ struct ClassProperty {
 
 #[derive(PartialEq, Debug)]
 enum ProcedureType {
-    Standard(ServiceMethod),
+    Standard(StandardMethod),
     PropertyGetter(ServiceProperty),
     PropertySetter(ServiceProperty),
     ClassMethod(ClassMethod),
@@ -89,47 +89,52 @@ fn get_procedure_type(procedure_name: &str) -> ProcedureType {
             }
         }
     }
-    return ProcedureType::Standard(ServiceMethod {
+    return ProcedureType::Standard(StandardMethod {
         name: procedure_name.to_string(),
     })
 }
 
 pub fn create_output_structure(input_structure: &original::Content) -> output::OutputStructure {
-    let mut service_methods = HashMap::<String, original::Procedure>::new();
-    let mut service_getters = HashMap::<String, output::Function>::new();
-    let mut service_setters = HashMap::<String, original::Procedure>::new();
+    let mut service_methods = Vec::<output::StandardMethod>::new();
+    let mut service_getters = Vec::<output::PropertyGetterFunction>::new();
+    let mut service_setters = Vec::<output::PropertySetterFunction>::new();
     let mut classes = HashMap::<String, output::Class>::new();
     for proc in &input_structure.procedures {
         let procedure_type = get_procedure_type(proc.0);
         match &procedure_type {
             ProcedureType::Standard(x) => {
-                service_methods.insert(x.name.clone(), (proc.1).clone());
+                service_methods.push(convert_service_method(&x, &proc.1));
             },
             ProcedureType::PropertyGetter(x) => {
-                service_getters.insert(x.name.clone(), convert_to_function(&procedure_type, &proc.1));
+                service_getters.push(convert_property_getter(&x, &proc.1));
             },
             ProcedureType::PropertySetter(x) => {
-                service_setters.insert(x.name.clone(), (proc.1).clone());
+                service_setters.push(convert_property_setter(&x, &proc.1));
             },
             ProcedureType::ClassMethod(x) => {
                 add_class_if_nonexistent(&mut classes, &x.class);
-                classes.get_mut(&x.class).unwrap().methods.insert(x.method.clone(), (proc.1).clone());
+                classes.get_mut(&x.class).unwrap().methods.push(convert_class_method(&x, &proc.1));
             },
             ProcedureType::ClassPropertyGetter(x) => {
                 add_class_if_nonexistent(&mut classes, &x.class);
-                classes.get_mut(&x.class).unwrap().getters.insert(x.property.clone(), (proc.1).clone());
+                classes.get_mut(&x.class).unwrap().getters.push(convert_class_property_getter(&x, &proc.1));
             },
             ProcedureType::ClassPropertySetter(x) => {
                 add_class_if_nonexistent(&mut classes, &x.class);
-                classes.get_mut(&x.class).unwrap().setters.insert(x.property.clone(), (proc.1).clone());
+                classes.get_mut(&x.class).unwrap().getters.push(convert_class_property_setter(&x, &proc.1));
             },
             ProcedureType::StaticClassMethod(x) => {
                 add_class_if_nonexistent(&mut classes, &x.class);
-                classes.get_mut(&x.class).unwrap().static_methods.insert(x.method.clone(), (proc.1).clone());
+                classes.get_mut(&x.class).unwrap().methods.push(convert_static_class_method(&x, &proc.1));
             },
             ProcedureType::Unknown => {}
         }
     }
+    
+    // Sort lists
+    service_methods.sort();
+    service_getters.sort();
+    service_setters.sort();
     
     output::OutputStructure {
         methods: service_methods,
@@ -142,44 +147,100 @@ pub fn create_output_structure(input_structure: &original::Content) -> output::O
 fn add_class_if_nonexistent(classes: &mut HashMap<String, output::Class>, class_name: &String) {
     if let None = classes.get(class_name) {
         classes.insert(class_name.clone(), output::Class {
-            methods: HashMap::new(),
-            getters: HashMap::new(),
-            setters: HashMap::new(),
-            static_methods: HashMap::new(),
+            name: class_name.clone(),
+            methods: vec![],
+            getters: vec![],
+            setters: vec![],
+            static_methods: vec![],
         });
     }
-
 }
 
-fn convert_to_function(procedure_type: &ProcedureType, procedure: &original::Procedure) -> output::Function {
-    let return_type = match &procedure.return_type {
-        Some(t) => {
-            match t.code {
-                original::Code::Class => {
-                    output::ReturnType::Class{ name: t.name.clone().unwrap()}
-                },
-                _ => output::ReturnType::Empty
-            }
-        },
-        None => output::ReturnType::Empty,
-    };
-    
-    let function_name = match &procedure_type {
-        ProcedureType::Standard(x) => x.name.to_case(Case::Snake),
-        ProcedureType::PropertyGetter(x) => "get_".to_string() + x.name.to_case(Case::Snake).as_str(),
-        ProcedureType::PropertySetter(x) => "set_".to_string() + x.name.to_case(Case::Snake).as_str(),
-        ProcedureType::ClassMethod(x) => x.method.to_case(Case::Snake),
-        ProcedureType::ClassPropertyGetter(x) => "get_".to_string() + x.class.to_case(Case::Snake).as_str(),
-        ProcedureType::ClassPropertySetter(x) => "set_".to_string() + x.class.to_case(Case::Snake).as_str(),
-        ProcedureType::StaticClassMethod(x) => x.method.to_case(Case::Snake),
-        ProcedureType::Unknown => "".to_string(),
-    };
-
-    output::Function {
-        name: function_name,
-        return_type,
+fn convert_service_method(property: &StandardMethod, procedure: &original::Procedure) -> output::StandardMethod {
+    output::StandardMethod {
+        id: procedure.id,
+        name: property.name.to_case(Case::Snake),
+        return_type_signature: "".to_string(),
     }
 }
+
+fn convert_property_getter(property: &ServiceProperty, procedure: &original::Procedure) -> output::PropertyGetterFunction {
+    output::PropertyGetterFunction {
+        id: procedure.id,
+        name: "get_".to_string() + property.name.to_case(Case::Snake).as_str(),
+        return_type_signature: "".to_string(),
+    }
+}
+
+fn convert_property_setter(property: &ServiceProperty, procedure: &original::Procedure) -> output::PropertySetterFunction {
+    output::PropertySetterFunction {
+        id: procedure.id,
+        name: "set_".to_string() + property.name.to_case(Case::Snake).as_str(),
+        return_type_signature: "".to_string(),
+    }
+}
+
+fn convert_class_method(property: &ClassMethod, procedure: &original::Procedure) -> output::StandardMethod {
+    output::StandardMethod {
+        id: procedure.id,
+        name: property.method.to_case(Case::Snake),
+        return_type_signature: "".to_string(),
+    }
+}
+
+fn convert_class_property_getter(property: &ClassProperty, procedure: &original::Procedure) -> output::PropertyGetterFunction {
+    output::PropertyGetterFunction {
+        id: procedure.id,
+        name: "get_".to_string() + property.property.to_case(Case::Snake).as_str(),
+        return_type_signature: "".to_string(),
+    }
+}
+
+fn convert_class_property_setter(property: &ClassProperty, procedure: &original::Procedure) -> output::PropertyGetterFunction {
+    output::PropertyGetterFunction {
+        id: procedure.id,
+        name: "set_".to_string() + property.property.to_case(Case::Snake).as_str(),
+        return_type_signature: "".to_string(),
+    }
+}
+
+fn convert_static_class_method(property: &ClassMethod, procedure: &original::Procedure) -> output::StandardMethod {
+    output::StandardMethod {
+        id: procedure.id,
+        name: property.method.to_case(Case::Snake),
+        return_type_signature: "".to_string(),
+    }
+}
+
+
+
+// fn convert_to_function(procedure_type: &ProcedureType, procedure: &original::Procedure) -> output::Function {
+//     let return_type = match &procedure.return_type {
+//         Some(t) => {
+//             match t.code {
+//                 original::Code::Class => {
+//                     output::ReturnType::Class{ name: t.name.clone().unwrap()}
+//                 },
+//                 _ => output::ReturnType::Empty
+//             }
+//         },
+//         None => output::ReturnType::Empty,
+//     };
+    
+//     let function = match &procedure_type {
+//         ProcedureType::Standard(x) => output::Function{
+//             name: x.name.to_case(Case::Snake),
+//             return_type_signature: "".to_string(),
+//         },
+//         ProcedureType::PropertyGetter(x) => "get_".to_string() + x.name.to_case(Case::Snake).as_str(),
+//         ProcedureType::PropertySetter(x) => "set_".to_string() + x.name.to_case(Case::Snake).as_str(),
+//         ProcedureType::ClassMethod(x) => x.method.to_case(Case::Snake),
+//         ProcedureType::ClassPropertyGetter(x) => "get_".to_string() + x.class.to_case(Case::Snake).as_str(),
+//         ProcedureType::ClassPropertySetter(x) => "set_".to_string() + x.class.to_case(Case::Snake).as_str(),
+//         ProcedureType::StaticClassMethod(x) => x.method.to_case(Case::Snake),
+//         ProcedureType::Unknown => "".to_string(),
+//     };
+// }
 
 #[cfg(test)]
 mod tests {
@@ -188,7 +249,7 @@ mod tests {
     #[test]
     fn test_standard_method() {
         let result = get_procedure_type("WarpTo");
-        let expected = ProcedureType::Standard(ServiceMethod {
+        let expected = ProcedureType::Standard(StandardMethod {
             name: "WarpTo".to_string(),
         });
         assert_eq!(result, expected);

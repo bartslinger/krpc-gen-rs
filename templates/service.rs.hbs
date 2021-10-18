@@ -15,10 +15,26 @@ impl<'s> {{ service_name }}<'s> {
             conn
         }
     }
-    {{#each service_getters as |getter|}}
-    
-    pub async fn {{ name }}(&'s self) -> Result<{{ return_type getter.return_type }}, Error> {
 
+    // service methods
+    {{#each service_methods as |method|}}
+
+    pub async fn {{ method.name }}(&'s self) -> Result<{{ method.return_type_signature }}, Error> {
     }
     {{/each}}
+
+    // getters
+    {{#each service_getters as |getter|}}
+
+    pub async fn {{ getter.name }}(&'s self) -> Result<{{ getter.return_type_signature }}, Error> {
+    }
+    {{/each}}
+    
+    // setters
+    {{#each service_setters as |setter|}}
+
+    pub async fn {{ setter.name }}(&'s self) -> Result<{{ setter.return_type_signature }}, Error> {
+    }
+    {{/each}}
+
 }
