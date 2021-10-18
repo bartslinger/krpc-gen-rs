@@ -3,59 +3,65 @@ use crate::connection;
 use crate::connection::Connection;
 use crate::decoder;
 use crate::encoder;
+use crate::error;
 
 use super::schema;
 
-pub struct {{ service_name }}<'s> {
-    conn: &'s Connection,
+pub struct {{{ service_name }}}<'a> {
+    conn: &'a Connection,
 }
-impl<'s> {{ service_name }}<'s> {
-    pub fn new(conn: &'s Connection) -> {{ service_name }}<'s> {
-        {{ service_name }}<'s> {
-            conn
+impl<'a> {{{ service_name }}}<'a> {
+    pub fn new(conn: &'a Connection) -> {{{ service_name }}}<'a> {
+        {{{ service_name }}} {
+            conn,
         }
     }
 
     // service methods
     {{#each service_methods as |method|}}
-
-    pub async fn {{ method.name }}(&'s self) -> Result<{{ method.return_type_signature }}, Error> {
+    pub async fn {{{ method.name }}}(&'a self) -> Result<{{{ method.return_type_signature }}}, error::Error> {
+        Ok({{{ method.return_value }}})
     }
+
     {{/each}}
 
     // getters
     {{#each service_getters as |getter|}}
-
-    pub async fn {{ getter.name }}(&'s self) -> Result<{{ getter.return_type_signature }}, Error> {
+    pub async fn {{{ getter.name }}}(&'a self) -> Result<{{{ getter.return_type_signature }}}, error::Error> {
+       let result = self.conn.execute_procedure("{{{ ../service_name }}}", "{{{ getter.procedure }}}", vec![]).await?;
+       Ok({{{ getter.return_value }}})
     }
+
     {{/each}}
     
     // setters
     {{#each service_setters as |setter|}}
-
-    pub async fn {{ setter.name }}(&'s self) -> Result<{{ setter.return_type_signature }}, Error> {
+    pub async fn {{{ setter.name }}}(&'a self) -> Result<{{{ setter.return_type_signature }}}, error::Error> {
+        Ok({{{ setter.return_value }}})
     }
+
     {{/each}}
 }
 
 // Classes
 {{#each classes as |class| }}
-pub struct {{ class.name }}<'a> {
+#[derive(Debug)]
+pub struct {{{ class.name }}}<'a> {
     id: u64,
-    conn: &'a Connection<'a>,
+    conn: &'a Connection,
 }
-impl<'a> {{ class.name }}<'a> {
+impl<'a> {{{ class.name }}}<'a> {
     // methods
     {{#each class.methods as |method| }}
-    async fn {{ method.name }}(&'a self) -> Result<{{ method.return_type_signature }}, Error> {
-        
+    async fn {{{ method.name }}}(&'a self) -> Result<{{{ method.return_type_signature }}}, error::Error> {
+        Ok({{{ method.return_value }}})
     }
 
     {{/each}}
     // getters
     {{#each class.getters as |getter| }}
-    async fn {{ getter.name }}(&'a self) -> Result<{{ getter.return_type_signature }}, Error> {
-        
+    async fn {{{ getter.name }}}(&'a self) -> Result<{{{ getter.return_type_signature }}}, error::Error> {
+        Ok({{{ getter.return_value }}})
     }
 
     {{/each}}

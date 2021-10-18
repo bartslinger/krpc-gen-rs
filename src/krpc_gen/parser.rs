@@ -6,22 +6,26 @@ use crate::output;
 
 #[derive(PartialEq, Debug)]
 struct StandardMethod {
+    procedure: String,
     name: String,    
 }
 
 #[derive(PartialEq, Debug)]
 struct ServiceProperty {
+    procedure: String,
     name: String,
 }
 
 #[derive(PartialEq, Debug)]
 struct ClassMethod {
+    procedure: String,
     class: String,
     method: String,
 }
 
 #[derive(PartialEq, Debug)]
 struct ClassProperty {
+    procedure: String,
     class: String,
     property: String,
 }
@@ -46,18 +50,21 @@ fn get_procedure_type(procedure_name: &str) -> ProcedureType {
         match &cap[2] {
             "get" => {
                 return ProcedureType::ClassPropertyGetter(ClassProperty {
+                    procedure: procedure_name.to_string(),
                     class: (&cap[1]).to_string(),
                     property: (&cap[3]).to_string(),
                 });
             },
             "set" => {
                 return ProcedureType::ClassPropertySetter(ClassProperty {
+                    procedure: procedure_name.to_string(),
                     class: (&cap[1]).to_string(),
                     property: (&cap[3]).to_string(),
                 });
             },
             "static" => {
                 return ProcedureType::StaticClassMethod(ClassMethod {
+                    procedure: procedure_name.to_string(),
                     class: (&cap[1]).to_string(),
                     method: (&cap[3]).to_string(),
                 });
@@ -73,16 +80,19 @@ fn get_procedure_type(procedure_name: &str) -> ProcedureType {
         match &cap[1] {
             "get" => {
                 return ProcedureType::PropertyGetter(ServiceProperty {
+                    procedure: procedure_name.to_string(),
                     name: (&cap[2]).to_string(),
                 })
             },
             "set" => {
                 return ProcedureType::PropertySetter(ServiceProperty {
+                    procedure: procedure_name.to_string(),
                     name: (&cap[2]).to_string(),
                 })
             },
             _ => {
                 return ProcedureType::ClassMethod(ClassMethod {
+                    procedure: procedure_name.to_string(),
                     class: (&cap[1]).to_string(),
                     method: (&cap[2]).to_string(),
                 })
@@ -90,6 +100,7 @@ fn get_procedure_type(procedure_name: &str) -> ProcedureType {
         }
     }
     return ProcedureType::Standard(StandardMethod {
+        procedure: procedure_name.to_string(),
         name: procedure_name.to_string(),
     })
 }
@@ -166,88 +177,108 @@ fn add_class_if_nonexistent(classes: &mut HashMap<String, output::Class>, class_
 fn convert_service_method(property: &StandardMethod, procedure: &original::Procedure) -> output::StandardMethod {
     output::StandardMethod {
         id: procedure.id,
+        procedure: property.procedure.clone(),
         name: property.name.to_case(Case::Snake),
-        return_type_signature: "()".to_string(),
+        return_type_signature: return_type_signature(&procedure),
+        return_value: return_value(&procedure),
     }
 }
 
 fn convert_property_getter(property: &ServiceProperty, procedure: &original::Procedure) -> output::PropertyGetterFunction {
     output::PropertyGetterFunction {
         id: procedure.id,
+        procedure: property.procedure.clone(),
         name: "get_".to_string() + property.name.to_case(Case::Snake).as_str(),
-        return_type_signature: "()".to_string(),
+        return_type_signature: return_type_signature(&procedure),
+        return_value: return_value(&procedure),
     }
 }
 
 fn convert_property_setter(property: &ServiceProperty, procedure: &original::Procedure) -> output::PropertySetterFunction {
     output::PropertySetterFunction {
         id: procedure.id,
+        procedure: property.procedure.clone(),
         name: "set_".to_string() + property.name.to_case(Case::Snake).as_str(),
-        return_type_signature: "()".to_string(),
+        return_type_signature: return_type_signature(&procedure),
+        return_value: return_value(&procedure),
     }
 }
 
 fn convert_class_method(property: &ClassMethod, procedure: &original::Procedure) -> output::StandardMethod {
     output::StandardMethod {
         id: procedure.id,
+        procedure: property.procedure.clone(),
         name: property.method.to_case(Case::Snake),
-        return_type_signature: "()".to_string(),
+        return_type_signature: return_type_signature(&procedure),
+        return_value: return_value(&procedure),
     }
 }
 
 fn convert_class_property_getter(property: &ClassProperty, procedure: &original::Procedure) -> output::PropertyGetterFunction {
     output::PropertyGetterFunction {
         id: procedure.id,
+        procedure: property.procedure.clone(),
         name: "get_".to_string() + property.property.to_case(Case::Snake).as_str(),
-        return_type_signature: "()".to_string(),
+        return_type_signature: return_type_signature(&procedure),
+        return_value: return_value(&procedure),
     }
 }
 
 fn convert_class_property_setter(property: &ClassProperty, procedure: &original::Procedure) -> output::PropertyGetterFunction {
     output::PropertyGetterFunction {
         id: procedure.id,
+        procedure: property.procedure.clone(),
         name: "set_".to_string() + property.property.to_case(Case::Snake).as_str(),
-        return_type_signature: "()".to_string(),
+        return_type_signature: return_type_signature(&procedure),
+        return_value: return_value(&procedure),
     }
 }
 
 fn convert_static_class_method(property: &ClassMethod, procedure: &original::Procedure) -> output::StandardMethod {
     output::StandardMethod {
         id: procedure.id,
+        procedure: property.procedure.clone(),
         name: property.method.to_case(Case::Snake),
-        return_type_signature: "()".to_string(),
+        return_type_signature: return_type_signature(&procedure),
+        return_value: return_value(&procedure),
     }
 }
 
+fn return_type_signature(procedure: &original::Procedure) -> String {
+    match &procedure.return_type {
+        Some(return_type) => {
+            match (&return_type.code, &return_type.name) {
+                (original::Code::Class, Some(name)) => {
+                    name.clone() + "<'a>"
+                },
+                _ => {
+                    "()".to_string()
+                }
+            }
+        },
+        None => {
+            "()".to_string()
+        },
+    }
+}
 
-
-// fn convert_to_function(procedure_type: &ProcedureType, procedure: &original::Procedure) -> output::Function {
-//     let return_type = match &procedure.return_type {
-//         Some(t) => {
-//             match t.code {
-//                 original::Code::Class => {
-//                     output::ReturnType::Class{ name: t.name.clone().unwrap()}
-//                 },
-//                 _ => output::ReturnType::Empty
-//             }
-//         },
-//         None => output::ReturnType::Empty,
-//     };
-    
-//     let function = match &procedure_type {
-//         ProcedureType::Standard(x) => output::Function{
-//             name: x.name.to_case(Case::Snake),
-//             return_type_signature: "".to_string(),
-//         },
-//         ProcedureType::PropertyGetter(x) => "get_".to_string() + x.name.to_case(Case::Snake).as_str(),
-//         ProcedureType::PropertySetter(x) => "set_".to_string() + x.name.to_case(Case::Snake).as_str(),
-//         ProcedureType::ClassMethod(x) => x.method.to_case(Case::Snake),
-//         ProcedureType::ClassPropertyGetter(x) => "get_".to_string() + x.class.to_case(Case::Snake).as_str(),
-//         ProcedureType::ClassPropertySetter(x) => "set_".to_string() + x.class.to_case(Case::Snake).as_str(),
-//         ProcedureType::StaticClassMethod(x) => x.method.to_case(Case::Snake),
-//         ProcedureType::Unknown => "".to_string(),
-//     };
-// }
+fn return_value(procedure: &original::Procedure) -> String {
+    match &procedure.return_type {
+        Some(return_type) => {
+            match (&return_type.code, &return_type.name) {
+                (original::Code::Class, Some(name)) => {
+                    format!("{}{{id: 0, conn: &self.conn}}", name)
+                },
+                _ => {
+                    "()".to_string()
+                }
+            }
+        },
+        None => {
+            "()".to_string()
+        },
+    }
+}
 
 #[cfg(test)]
 mod tests {
