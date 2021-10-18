@@ -179,6 +179,7 @@ fn convert_service_method(property: &StandardMethod, procedure: &original::Proce
         id: procedure.id,
         procedure: property.procedure.clone(),
         name: property.name.to_case(Case::Snake),
+        decoder_function: decoder_function(&procedure),
         return_type_signature: return_type_signature(&procedure),
         return_value: return_value(&procedure),
     }
@@ -189,6 +190,7 @@ fn convert_property_getter(property: &ServiceProperty, procedure: &original::Pro
         id: procedure.id,
         procedure: property.procedure.clone(),
         name: "get_".to_string() + property.name.to_case(Case::Snake).as_str(),
+        decoder_function: decoder_function(&procedure),
         return_type_signature: return_type_signature(&procedure),
         return_value: return_value(&procedure),
     }
@@ -199,6 +201,7 @@ fn convert_property_setter(property: &ServiceProperty, procedure: &original::Pro
         id: procedure.id,
         procedure: property.procedure.clone(),
         name: "set_".to_string() + property.name.to_case(Case::Snake).as_str(),
+        decoder_function: decoder_function(&procedure),
         return_type_signature: return_type_signature(&procedure),
         return_value: return_value(&procedure),
     }
@@ -209,6 +212,7 @@ fn convert_class_method(property: &ClassMethod, procedure: &original::Procedure)
         id: procedure.id,
         procedure: property.procedure.clone(),
         name: property.method.to_case(Case::Snake),
+        decoder_function: decoder_function(&procedure),
         return_type_signature: return_type_signature(&procedure),
         return_value: return_value(&procedure),
     }
@@ -219,6 +223,7 @@ fn convert_class_property_getter(property: &ClassProperty, procedure: &original:
         id: procedure.id,
         procedure: property.procedure.clone(),
         name: "get_".to_string() + property.property.to_case(Case::Snake).as_str(),
+        decoder_function: decoder_function(&procedure),
         return_type_signature: return_type_signature(&procedure),
         return_value: return_value(&procedure),
     }
@@ -229,6 +234,7 @@ fn convert_class_property_setter(property: &ClassProperty, procedure: &original:
         id: procedure.id,
         procedure: property.procedure.clone(),
         name: "set_".to_string() + property.property.to_case(Case::Snake).as_str(),
+        decoder_function: decoder_function(&procedure),
         return_type_signature: return_type_signature(&procedure),
         return_value: return_value(&procedure),
     }
@@ -239,8 +245,21 @@ fn convert_static_class_method(property: &ClassMethod, procedure: &original::Pro
         id: procedure.id,
         procedure: property.procedure.clone(),
         name: property.method.to_case(Case::Snake),
+        decoder_function: decoder_function(&procedure),
         return_type_signature: return_type_signature(&procedure),
         return_value: return_value(&procedure),
+    }
+}
+
+fn decoder_function(procedure: &original::Procedure) -> String {
+    match &procedure.return_type {
+        Some(return_type) => {
+            match &return_type.code {
+                original::Code::Class => "decode_class".to_string(),
+                _ => "decode_double".to_string()
+            }
+        },
+        None => "decode_float".to_string()
     }
 }
 
@@ -267,7 +286,7 @@ fn return_value(procedure: &original::Procedure) -> String {
         Some(return_type) => {
             match (&return_type.code, &return_type.name) {
                 (original::Code::Class, Some(name)) => {
-                    format!("{}{{id: 0, conn: &self.conn}}", name)
+                    format!("{}{{id: return_value, conn: &self.conn}}", name)
                 },
                 _ => {
                     "()".to_string()

@@ -23,6 +23,7 @@ pub struct PropertyGetterFunction {
     pub id: u64,
     pub procedure: String,
     pub name: String,
+    pub decoder_function: String,
     pub return_type_signature: String,
     pub return_value: String,
 }
@@ -32,6 +33,7 @@ pub struct PropertySetterFunction {
     pub id: u64,
     pub procedure: String,
     pub name: String,
+    pub decoder_function: String,
     pub return_type_signature: String,
     pub return_value: String,
 }
@@ -41,6 +43,7 @@ pub struct StandardMethod {
     pub id: u64,
     pub procedure: String,
     pub name: String,
+    pub decoder_function: String,
     pub return_type_signature: String,
     pub return_value: String,
 }

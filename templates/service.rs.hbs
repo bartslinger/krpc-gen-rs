@@ -20,6 +20,8 @@ impl<'a> {{{ service_name }}}<'a> {
     // service methods
     {{#each service_methods as |method|}}
     pub async fn {{{ method.name }}}(&'a self) -> Result<{{{ method.return_type_signature }}}, error::Error> {
+        let result = self.conn.execute_procedure("{{{ ../service_name }}}", "{{{ getter.procedure }}}", vec![]).await?;
+        let return_value = decoder::{{{ decoder_function }}}(result)?;
         Ok({{{ method.return_value }}})
     }
 
@@ -29,6 +31,7 @@ impl<'a> {{{ service_name }}}<'a> {
     {{#each service_getters as |getter|}}
     pub async fn {{{ getter.name }}}(&'a self) -> Result<{{{ getter.return_type_signature }}}, error::Error> {
        let result = self.conn.execute_procedure("{{{ ../service_name }}}", "{{{ getter.procedure }}}", vec![]).await?;
+       let return_value = decoder::{{{ decoder_function }}}(result)?;
        Ok({{{ getter.return_value }}})
     }
 
@@ -37,6 +40,8 @@ impl<'a> {{{ service_name }}}<'a> {
     // setters
     {{#each service_setters as |setter|}}
     pub async fn {{{ setter.name }}}(&'a self) -> Result<{{{ setter.return_type_signature }}}, error::Error> {
+        let result = self.conn.execute_procedure("{{{ ../service_name }}}", "{{{ getter.procedure }}}", vec![]).await?;
+        let return_value = decoder::{{{ decoder_function }}}(result)?;
         Ok({{{ setter.return_value }}})
     }
 
@@ -53,14 +58,18 @@ pub struct {{{ class.name }}}<'a> {
 impl<'a> {{{ class.name }}}<'a> {
     // methods
     {{#each class.methods as |method| }}
-    async fn {{{ method.name }}}(&'a self) -> Result<{{{ method.return_type_signature }}}, error::Error> {
+    pub async fn {{{ method.name }}}(&'a self) -> Result<{{{ method.return_type_signature }}}, error::Error> {
+        let result = self.conn.execute_procedure("{{{ ../service_name }}}", "{{{ getter.procedure }}}", vec![]).await?;
+        let return_value = decoder::{{{ decoder_function }}}(result)?;
         Ok({{{ method.return_value }}})
     }
 
     {{/each}}
     // getters
     {{#each class.getters as |getter| }}
-    async fn {{{ getter.name }}}(&'a self) -> Result<{{{ getter.return_type_signature }}}, error::Error> {
+    pub async fn {{{ getter.name }}}(&'a self) -> Result<{{{ getter.return_type_signature }}}, error::Error> {
+        let result = self.conn.execute_procedure("{{{ ../service_name }}}", "{{{ getter.procedure }}}", vec![]).await?;
+        let return_value = decoder::{{{ decoder_function }}}(result)?;
         Ok({{{ getter.return_value }}})
     }
 
