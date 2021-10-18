@@ -15,7 +15,7 @@ pub fn write_to_file(service_name: &str, path: &str, output_structure: &output::
     data.insert("service_methods".to_string(), handlebars::to_json(&output_structure.methods));
     data.insert("service_getters".to_string(), handlebars::to_json(&output_structure.getters));
     data.insert("service_setters".to_string(), handlebars::to_json(&output_structure.setters));
-    // data.insert("classes".to_string(), handlebars::to_json(&output_structure.classes));
+    data.insert("classes".to_string(), handlebars::to_json(&output_structure.classes));
 
     handlebars.render_to_write("template", &data, &mut output_file).unwrap();
 }

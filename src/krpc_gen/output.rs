@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use serde::Serialize;
 use crate::original;
 
+#[derive(Serialize, Debug, Clone, Default)]
 pub struct OutputStructure {
     pub methods: Vec<StandardMethod>,
     pub getters: Vec<PropertyGetterFunction>,
@@ -9,7 +10,7 @@ pub struct OutputStructure {
     pub classes: HashMap<String, Class>,
 }
 
-#[derive(Debug)]
+#[derive(Serialize, Debug, Clone, Default)]
 pub struct Class {
     pub name: String,
     pub methods: Vec<StandardMethod>,

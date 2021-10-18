@@ -36,5 +36,29 @@ impl<'s> {{ service_name }}<'s> {
     pub async fn {{ setter.name }}(&'s self) -> Result<{{ setter.return_type_signature }}, Error> {
     }
     {{/each}}
-
 }
+
+// Classes
+{{#each classes as |class| }}
+pub struct {{ class.name }}<'a> {
+    id: u64,
+    conn: &'a Connection<'a>,
+}
+impl<'a> {{ class.name }}<'a> {
+    // methods
+    {{#each class.methods as |method| }}
+    async fn {{ method.name }}(&'a self) -> Result<{{ method.return_type_signature }}, Error> {
+        
+    }
+
+    {{/each}}
+    // getters
+    {{#each class.getters as |getter| }}
+    async fn {{ getter.name }}(&'a self) -> Result<{{ getter.return_type_signature }}, Error> {
+        
+    }
+
+    {{/each}}
+}
+
+{{/each}}

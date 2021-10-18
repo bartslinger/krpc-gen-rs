@@ -136,6 +136,13 @@ pub fn create_output_structure(input_structure: &original::Content) -> output::O
     service_getters.sort();
     service_setters.sort();
     
+    for (_, class) in &mut classes {
+        class.methods.sort();
+        class.getters.sort();
+        class.setters.sort();
+        class.static_methods.sort();
+    }
+    
     output::OutputStructure {
         methods: service_methods,
         getters: service_getters,
@@ -160,7 +167,7 @@ fn convert_service_method(property: &StandardMethod, procedure: &original::Proce
     output::StandardMethod {
         id: procedure.id,
         name: property.name.to_case(Case::Snake),
-        return_type_signature: "".to_string(),
+        return_type_signature: "()".to_string(),
     }
 }
 
@@ -168,7 +175,7 @@ fn convert_property_getter(property: &ServiceProperty, procedure: &original::Pro
     output::PropertyGetterFunction {
         id: procedure.id,
         name: "get_".to_string() + property.name.to_case(Case::Snake).as_str(),
-        return_type_signature: "".to_string(),
+        return_type_signature: "()".to_string(),
     }
 }
 
@@ -176,7 +183,7 @@ fn convert_property_setter(property: &ServiceProperty, procedure: &original::Pro
     output::PropertySetterFunction {
         id: procedure.id,
         name: "set_".to_string() + property.name.to_case(Case::Snake).as_str(),
-        return_type_signature: "".to_string(),
+        return_type_signature: "()".to_string(),
     }
 }
 
@@ -184,7 +191,7 @@ fn convert_class_method(property: &ClassMethod, procedure: &original::Procedure)
     output::StandardMethod {
         id: procedure.id,
         name: property.method.to_case(Case::Snake),
-        return_type_signature: "".to_string(),
+        return_type_signature: "()".to_string(),
     }
 }
 
@@ -192,7 +199,7 @@ fn convert_class_property_getter(property: &ClassProperty, procedure: &original:
     output::PropertyGetterFunction {
         id: procedure.id,
         name: "get_".to_string() + property.property.to_case(Case::Snake).as_str(),
-        return_type_signature: "".to_string(),
+        return_type_signature: "()".to_string(),
     }
 }
 
@@ -200,7 +207,7 @@ fn convert_class_property_setter(property: &ClassProperty, procedure: &original:
     output::PropertyGetterFunction {
         id: procedure.id,
         name: "set_".to_string() + property.property.to_case(Case::Snake).as_str(),
-        return_type_signature: "".to_string(),
+        return_type_signature: "()".to_string(),
     }
 }
 
@@ -208,7 +215,7 @@ fn convert_static_class_method(property: &ClassMethod, procedure: &original::Pro
     output::StandardMethod {
         id: procedure.id,
         name: property.method.to_case(Case::Snake),
-        return_type_signature: "".to_string(),
+        return_type_signature: "()".to_string(),
     }
 }
 
