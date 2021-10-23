@@ -3,9 +3,11 @@ use handlebars;
 
 use crate::output;
 
-pub fn write_to_file(service_name: &str, path: &str, output_structure: &output::OutputStructure) {
+pub fn write_to_file(service_name: &str, path: &std::path::Path, output_structure: &output::OutputStructure) {
     let mut handlebars = handlebars::Handlebars::new();
-    handlebars.register_template_file("template", "templates/service.rs.hbs").unwrap();
+    
+    let template_bytes = std::include_bytes!("../../templates/service.rs.hbs");
+    handlebars.register_template_string("template", String::from_utf8_lossy(template_bytes)).unwrap();
 
     let mut output_file = File::create(path).unwrap();
 
@@ -18,4 +20,7 @@ pub fn write_to_file(service_name: &str, path: &str, output_structure: &output::
     data.insert("classes".to_string(), handlebars::to_json(&output_structure.classes));
 
     handlebars.render_to_write("template", &data, &mut output_file).unwrap();
+    
+    let mut output_test_file = File::create("generated.rs").unwrap();
+    handlebars.render_to_write("template", &data, &mut output_test_file).unwrap();
 }

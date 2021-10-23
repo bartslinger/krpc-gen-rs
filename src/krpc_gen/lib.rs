@@ -3,13 +3,13 @@ mod parser;
 mod writer;
 mod output;
 
-pub fn generate_for(path: &str) {
+pub fn generate_for(path: &std::path::Path, output: &std::path::Path) {
 
     let input_structure = original::deserialize_from_file(path);
 
     for (service_name, content) in input_structure {
         let output_structure = parser::create_output_structure(&content);
-        writer::write_to_file(service_name.as_str(), "output/space_center.rs", &output_structure);
+        writer::write_to_file(service_name.as_str(), &output, &output_structure);
     }
 
    

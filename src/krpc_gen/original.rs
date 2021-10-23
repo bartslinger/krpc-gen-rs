@@ -61,7 +61,7 @@ enum GameScene {
     Flight,
 }
 
-pub fn deserialize_from_file(path: &str) -> HashMap<String, Content> {
+pub fn deserialize_from_file(path: &std::path::Path) -> HashMap<String, Content> {
     let file = File::open(path).unwrap();
     let reader = BufReader::new(file);
 
