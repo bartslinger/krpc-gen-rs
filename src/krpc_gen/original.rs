@@ -12,7 +12,7 @@ pub struct Content {
 #[derive(Deserialize, Debug, Clone)]
 pub struct Procedure {
     pub id: u64,
-    parameters: Vec<Parameter>,
+    pub parameters: Vec<Parameter>,
     game_scenes: Option<Vec<GameScene>>,
     pub return_type: Option<ReturnType>,
     return_is_nullable: Option<bool>,
@@ -20,14 +20,16 @@ pub struct Procedure {
 }
 
 #[derive(Deserialize, Debug, Clone)]
-struct Parameter {
-    name: String,
-    r#type: Type,
+pub struct Parameter {
+    pub name: String,
+    pub r#type: Type,
 }
 
 #[derive(Deserialize, Debug, Clone)]
 pub struct Type {
-    code: Code,
+    pub code: Code,
+    service: Option<String>,
+    pub name: Option<String>,
 }
 
 #[derive(Deserialize, Debug, Clone)]

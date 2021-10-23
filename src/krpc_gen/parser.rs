@@ -222,9 +222,63 @@ fn convert_method(property: &impl ParsedMethod, procedure: &original::Procedure)
         id: procedure.id,
         procedure: property.original_procedure_name(),
         name: property.function_name(),
+        arguments: convert_arguments(&procedure),
         decoder_function: decoder_function(&procedure),
         return_type_signature: return_type_signature(&procedure),
         return_value: return_value(&procedure),
+    }
+}
+
+fn convert_arguments(procedure: &original::Procedure) -> Vec<output::Argument> {
+    let mut arguments = Vec::new();
+    let mut position = 0;
+    for p in &procedure.parameters {
+        arguments.push(convert_single_argument(&p, position));
+        position += 1;
+    }
+    arguments
+}
+
+fn convert_single_argument(parameter: &original::Parameter, position: u64) -> output::Argument {
+    if parameter.name == "this" {
+        return output::Argument {
+            position: 0,
+            encoder_function: "encode_u64".to_string(),
+            value: "self.id".to_string(),
+        };
+    }
+    let encoder_function = match parameter.r#type.code {
+        original::Code::String => "encode_string".to_string(),
+        original::Code::Bool => "encode_bool".to_string(),
+        original::Code::Float => "encode_float".to_string(),
+        original::Code::Double => "encode_double".to_string(),
+        original::Code::Sint32 => "encode_sint32".to_string(),
+        original::Code::Uint32 => "encode_uint32".to_string(),
+        original::Code::Enumeration => "encode_enumeration".to_string(),
+        original::Code::List => "encode_list".to_string(),
+        original::Code::Dictionary => "encode_dictionary".to_string(),
+        original::Code::Set => "encode_set".to_string(),
+        original::Code::Tuple => "encode_tuple".to_string(),
+        original::Code::Class => "encode_u64".to_string(),
+    };
+    let value = match parameter.r#type.code {
+        original::Code::String => "".to_string(),
+        original::Code::Bool => "".to_string(),
+        original::Code::Float => "0.0".to_string(),
+        original::Code::Double => "0.0".to_string(),
+        original::Code::Sint32 => "".to_string(),
+        original::Code::Uint32 => "".to_string(),
+        original::Code::Enumeration => "".to_string(),
+        original::Code::List => "".to_string(),
+        original::Code::Dictionary => "".to_string(),
+        original::Code::Set => "".to_string(),
+        original::Code::Tuple => "".to_string(),
+        original::Code::Class => "0".to_string(), //parameter.r#type.name.clone().unwrap(),
+    };
+    output::Argument {
+        position,
+        encoder_function,
+        value,
     }
 }
 

@@ -21,9 +21,6 @@ impl<'a> {{{ service_name }}}<'a> {
     {{#each service_methods as |method|}}
     pub async fn {{{ method.name }}}(&'a self{{{ method.arguments_signature }}}) -> Result<{{{ method.return_type_signature }}}, error::Error> {
         let arguments = Vec::new();
-        {{#each getter.arguments as |argument| }}
-        arguments.push({{{ argument }}});
-        {{/each}}
         let result = self.conn.execute_procedure("{{{ ../service_name }}}", "{{{ procedure }}}", arguments).await?;
         let return_value = decoder::{{{ decoder_function }}}(result)?;
         Ok({{{ method.return_value }}})
@@ -35,9 +32,6 @@ impl<'a> {{{ service_name }}}<'a> {
     {{#each service_getters as |getter|}}
     pub async fn {{{ getter.name }}}(&'a self{{{ getter.arguments_signature }}}) -> Result<{{{ getter.return_type_signature }}}, error::Error> {
         let arguments = Vec::new();
-        {{#each getter.arguments as |argument| }}
-        arguments.push({{{ argument }}});
-        {{/each}}
         let result = self.conn.execute_procedure("{{{ ../service_name }}}", "{{{ getter.procedure }}}", arguments).await?;
         let return_value = decoder::{{{ decoder_function }}}(result)?;
         Ok({{{ getter.return_value }}})
@@ -49,9 +43,6 @@ impl<'a> {{{ service_name }}}<'a> {
     {{#each service_setters as |setter|}}
     pub async fn {{{ setter.name }}}(&'a self{{{ setter.arguments_signature }}}) -> Result<{{{ setter.return_type_signature }}}, error::Error> {
         let arguments = Vec::new();
-        {{#each getter.arguments as |argument| }}
-        arguments.push({{{ argument }}});
-        {{/each}}
         let result = self.conn.execute_procedure("{{{ ../service_name }}}", "{{{ getter.procedure }}}", arguments).await?;
         let return_value = decoder::{{{ decoder_function }}}(result)?;
         Ok({{{ setter.return_value }}})
@@ -72,9 +63,6 @@ impl<'a> {{{ class.name }}}<'a> {
     {{#each class.methods as |method| }}
     pub async fn {{{ method.name }}}(&'a self{{{ method.arguments_signature}}}) -> Result<{{{ method.return_type_signature }}}, error::Error> {
         let arguments = Vec::new();
-        {{#each getter.arguments as |argument| }}
-        arguments.push({{{ argument }}});
-        {{/each}}
         let result = self.conn.execute_procedure("{{{ ../service_name }}}", "{{{ getter.procedure }}}", arguments).await?;
         let return_value = decoder::{{{ decoder_function }}}(result)?;
         Ok({{{ method.return_value }}})
@@ -84,9 +72,12 @@ impl<'a> {{{ class.name }}}<'a> {
     // getters
     {{#each class.getters as |getter| }}
     pub async fn {{{ getter.name }}}(&'a self{{{ getter.arguments_signature}}}) -> Result<{{{ getter.return_type_signature }}}, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         {{#each getter.arguments as |argument| }}
-        arguments.push({{{ argument }}});
+        arguments.push(schema::Argument {
+            position: {{{argument.position}}},
+            value: encoder::{{{ argument.encoder_function }}}({{{ argument.value }}})?,
+        });
         {{/each}}
         let result = self.conn.execute_procedure("{{{ ../service_name }}}", "{{{ getter.procedure }}}", arguments).await?;
         let return_value = decoder::{{{ decoder_function }}}(result)?;
