@@ -19,7 +19,7 @@ impl<'a> {{{ service_name }}}<'a> {
 
     // service methods
     {{#each service_methods as |method|}}
-    pub async fn {{{ method.name }}}(&'a self{{{ method.arguments_signature }}}) -> Result<{{{ method.return_type_signature }}}, error::Error> {
+    pub async fn {{{ method.name }}}({{{ method.arguments_signature }}}) -> Result<{{{ method.return_type_signature }}}, error::Error> {
         {{#if method.arguments }}
         let mut arguments = Vec::new();
         {{else}}
@@ -40,7 +40,7 @@ impl<'a> {{{ service_name }}}<'a> {
 
     // getters and setters
     {{#each service_getters_setters as |method|}}
-    pub async fn {{{ method.name }}}(&'a self{{{ method.arguments_signature }}}) -> Result<{{{ method.return_type_signature }}}, error::Error> {
+    pub async fn {{{ method.name }}}({{{ method.arguments_signature }}}) -> Result<{{{ method.return_type_signature }}}, error::Error> {
         {{#if method.arguments }}
         let mut arguments = Vec::new();
         {{else}}
@@ -70,7 +70,7 @@ pub struct {{{ class.name }}}<'a> {
 impl<'a> {{{ class.name }}}<'a> {
     // methods
     {{#each class.methods as |method| }}
-    pub async fn {{{ method.name }}}(&'a self{{{ method.arguments_signature}}}) -> Result<{{{ method.return_type_signature }}}, error::Error> {
+    pub async fn {{{ method.name }}}({{{ method.arguments_signature}}}) -> Result<{{{ method.return_type_signature }}}, error::Error> {
         {{#if method.arguments }}
         let mut arguments = Vec::new();
         {{else}}
@@ -90,7 +90,7 @@ impl<'a> {{{ class.name }}}<'a> {
     {{/each}}
     // getters and setters
     {{#each class.getters_setters as |method| }}
-    pub async fn {{{ method.name }}}(&'a self{{{ method.arguments_signature}}}) -> Result<{{{ method.return_type_signature }}}, error::Error> {
+    pub async fn {{{ method.name }}}({{{ method.arguments_signature}}}) -> Result<{{{ method.return_type_signature }}}, error::Error> {
         {{#if method.arguments }}
         let mut arguments = Vec::new();
         {{else}}
@@ -109,9 +109,27 @@ impl<'a> {{{ class.name }}}<'a> {
 
     {{/each}}
     
-    // setters
-    
     // static methods
+    {{#each class.static_methods as |method| }}
+    pub async fn {{{ method.name }}}({{{ method.arguments_signature}}}) -> Result<{{{ method.return_type_signature }}}, error::Error> {
+        {{#if method.arguments }}
+        let mut arguments = Vec::new();
+        {{else}}
+        let arguments = Vec::new();
+        {{/if}}
+        {{#each method.arguments as |argument| }}
+        arguments.push(schema::Argument {
+            position: {{{argument.position}}},
+            value: encoder::{{{ argument.encoder_function }}}({{{ argument.value }}})?,
+        });
+        {{/each}}
+        let result = conn.execute_procedure("{{{ ../../service_name }}}", "{{{ method.procedure }}}", arguments).await?;
+        let return_value = decoder::{{{ decoder_function }}}(result)?;
+        Ok({{{ method.return_value }}})
+    }
+
+    {{/each}}
+
 }
 
 {{/each}}

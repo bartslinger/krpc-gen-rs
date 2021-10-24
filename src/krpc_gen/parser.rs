@@ -153,38 +153,51 @@ pub fn create_output_structure(input_structure: &original::Content) -> output::O
     let mut service_getters_setters = Vec::<output::Method>::new();
     let mut classes = HashMap::<String, output::Class>::new();
     let mut enumerations = Vec::<output::Enumeration>::new();
+    
+    // create maps for all classes
+    for class in &input_structure.classes {
+        classes.insert(class.0.clone(), output::Class {
+            name: class.0.clone(),
+            methods: vec![],
+            getters_setters: vec![],
+            static_methods: vec![],
+        });
+    }    
+
+    // parse procedures
     for proc in &input_structure.procedures {
         let procedure_type = get_procedure_type(proc.0);
         match &procedure_type {
             ProcedureType::Standard(x) => {
-                service_methods.push(convert_method(x, &proc.1));
+                service_methods.push(convert_method(x, &proc.1, false));
             },
             ProcedureType::PropertyGetter(x) => {
-                service_getters_setters.push(convert_method(x, &proc.1));
+                service_getters_setters.push(convert_method(x, &proc.1, false));
             },
             ProcedureType::PropertySetter(x) => {
-                service_getters_setters.push(convert_method(x, &proc.1));
+                service_getters_setters.push(convert_method(x, &proc.1, false));
             },
             ProcedureType::ClassMethod(x) => {
-                add_class_if_nonexistent(&mut classes, &x.class);
-                classes.get_mut(&x.class).unwrap().methods.push(convert_method(x, &proc.1));
+                // add_class_if_nonexistent(&mut classes, &x.class);
+                classes.get_mut(&x.class).unwrap().methods.push(convert_method(x, &proc.1, false));
             },
             ProcedureType::ClassPropertyGetter(x) => {
-                add_class_if_nonexistent(&mut classes, &x.class);
-                classes.get_mut(&x.class).unwrap().getters_setters.push(convert_method(x, &proc.1));
+                // add_class_if_nonexistent(&mut classes, &x.class);
+                classes.get_mut(&x.class).unwrap().getters_setters.push(convert_method(x, &proc.1, false));
             },
             ProcedureType::ClassPropertySetter(x) => {
-                add_class_if_nonexistent(&mut classes, &x.class);
-                classes.get_mut(&x.class).unwrap().getters_setters.push(convert_method(x, &proc.1));
+                // add_class_if_nonexistent(&mut classes, &x.class);
+                classes.get_mut(&x.class).unwrap().getters_setters.push(convert_method(x, &proc.1, false));
             },
             ProcedureType::StaticClassMethod(x) => {
-                add_class_if_nonexistent(&mut classes, &x.class);
-                classes.get_mut(&x.class).unwrap().methods.push(convert_method(x, &proc.1));
+                // add_class_if_nonexistent(&mut classes, &x.class);
+                classes.get_mut(&x.class).unwrap().static_methods.push(convert_method(x, &proc.1, true));
             },
             ProcedureType::Unknown => {}
         }
     }
     
+    // parse enums
     for e in &input_structure.enumerations {
         let enum_values: Vec<output::EnumerationValue> = e.1.values.iter()
             .map(|v| output::EnumerationValue {
@@ -217,41 +230,31 @@ pub fn create_output_structure(input_structure: &original::Content) -> output::O
     }
 }
 
-fn add_class_if_nonexistent(classes: &mut HashMap<String, output::Class>, class_name: &String) {
-    if let None = classes.get(class_name) {
-        classes.insert(class_name.clone(), output::Class {
-            name: class_name.clone(),
-            methods: vec![],
-            getters_setters: vec![],
-            static_methods: vec![],
-        });
-    }
-}
-
-fn convert_method(property: &impl ParsedMethod, procedure: &original::Procedure) -> output::Method {
+fn convert_method(property: &impl ParsedMethod, procedure: &original::Procedure, is_static: bool) -> output::Method {
     output::Method {
         id: procedure.id,
         procedure: property.original_procedure_name(),
         name: property.function_name(),
-        arguments_signature: arguments_signature(&procedure),
+        arguments_signature: arguments_signature(&procedure, is_static),
         arguments: convert_arguments(&procedure),
         decoder_function: decoder_function(&procedure),
         return_type_signature: return_type_signature(&procedure),
-        return_value: return_value(&procedure),
+        return_value: return_value(&procedure, is_static),
     }
 }
 
-fn arguments_signature(procedure: &original::Procedure) -> String {
+fn arguments_signature(procedure: &original::Procedure, is_static: bool) -> String {
+    let first_argument = if is_static { "conn: &'a Connection" } else { "&'a self" }.to_string();
     let arguments: Vec<String> = procedure.parameters.iter()
         .filter(|param| param.name != "this")
         .map(|param|
-            ", ".to_string() +
-            &param.name.to_case(Case::Snake) + ": " +
+            param.name.to_case(Case::Snake) + ": " +
             argument_type(param).as_str()
         )
         .collect();
 
-    arguments.join("")
+    let arguments = [Vec::from([first_argument]), arguments].concat();
+    arguments.join(", ")
 }
 
 fn argument_type(parameter: &original::Parameter) -> String {
@@ -365,7 +368,7 @@ fn return_type_signature(procedure: &original::Procedure) -> String {
     }
 }
 
-fn return_value(procedure: &original::Procedure) -> String {
+fn return_value(procedure: &original::Procedure, is_static: bool) -> String {
     match &procedure.return_type {
         Some(return_type) => {
             match &return_type.code {
@@ -381,7 +384,9 @@ fn return_value(procedure: &original::Procedure) -> String {
                 original::Code::Set |
                 original::Code::Tuple => "return_value".to_string(),
                 original::Code::Class => {
-                    format!("{}{{id: return_value, conn: &self.conn}}", return_type.name.clone().unwrap())
+                    format!("{}{{id: return_value, conn: {}}}",
+                        return_type.name.clone().unwrap(),
+                        if is_static { "&conn" } else { "&self.conn" })
                 },
             }
         },
