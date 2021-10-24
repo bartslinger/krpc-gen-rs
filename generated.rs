@@ -26,42 +26,42 @@ impl<'a> SpaceCenter<'a> {
     }
 
     pub async fn launchable_vessels(&'a self) -> Result<(/*list*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("SpaceCenter", "LaunchableVessels", arguments).await?;
         let return_value = decoder::decode_list(result)?;
         Ok(return_value)
     }
 
     pub async fn launch_vessel(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("SpaceCenter", "LaunchVessel", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
     pub async fn launch_vessel_from_vab(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("SpaceCenter", "LaunchVesselFromVAB", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
     pub async fn launch_vessel_from_sph(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("SpaceCenter", "LaunchVesselFromSPH", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
     pub async fn save(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("SpaceCenter", "Save", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
     pub async fn load(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("SpaceCenter", "Load", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
@@ -82,56 +82,56 @@ impl<'a> SpaceCenter<'a> {
     }
 
     pub async fn can_rails_warp_at(&'a self) -> Result<bool, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("SpaceCenter", "CanRailsWarpAt", arguments).await?;
         let return_value = decoder::decode_bool(result)?;
         Ok(return_value)
     }
 
     pub async fn warp_to(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("SpaceCenter", "WarpTo", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
     pub async fn transform_position(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("SpaceCenter", "TransformPosition", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
     pub async fn transform_direction(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("SpaceCenter", "TransformDirection", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
     pub async fn transform_rotation(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("SpaceCenter", "TransformRotation", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
     pub async fn transform_velocity(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("SpaceCenter", "TransformVelocity", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
     pub async fn raycast_distance(&'a self) -> Result<f64, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("SpaceCenter", "RaycastDistance", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
     pub async fn raycast_part(&'a self) -> Result<Part<'a>, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("SpaceCenter", "RaycastPart", arguments).await?;
         let return_value = decoder::decode_class(result)?;
         Ok(Part{id: return_value, conn: &self.conn})
@@ -309,56 +309,56 @@ impl<'a> SpaceCenter<'a> {
     
     // setters
     pub async fn set_active_vessel(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("SpaceCenter", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
     pub async fn set_target_body(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("SpaceCenter", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
     pub async fn set_target_vessel(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("SpaceCenter", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
     pub async fn set_target_docking_port(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("SpaceCenter", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
     pub async fn set_ui_visible(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("SpaceCenter", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
     pub async fn set_navball(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("SpaceCenter", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
     pub async fn set_rails_warp_factor(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("SpaceCenter", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
     pub async fn set_physics_warp_factor(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("SpaceCenter", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
@@ -375,14 +375,14 @@ pub struct Antenna<'a> {
 impl<'a> Antenna<'a> {
     // methods
     pub async fn transmit(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
     pub async fn cancel(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
@@ -565,28 +565,28 @@ pub struct AutoPilot<'a> {
 impl<'a> AutoPilot<'a> {
     // methods
     pub async fn engage(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
     pub async fn disengage(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
     pub async fn wait(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
     pub async fn target_pitch_and_heading(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
@@ -1406,133 +1406,133 @@ pub struct CelestialBody<'a> {
 impl<'a> CelestialBody<'a> {
     // methods
     pub async fn surface_height(&'a self) -> Result<f64, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
     pub async fn bedrock_height(&'a self) -> Result<f64, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
     pub async fn msl_position(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
     pub async fn surface_position(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
     pub async fn bedrock_position(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
     pub async fn position_at_altitude(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
     pub async fn latitude_at_position(&'a self) -> Result<f64, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
     pub async fn longitude_at_position(&'a self) -> Result<f64, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
     pub async fn altitude_at_position(&'a self) -> Result<f64, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
     pub async fn atmospheric_density_at_position(&'a self) -> Result<f64, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
     pub async fn temperature_at(&'a self) -> Result<f64, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
     pub async fn density_at(&'a self) -> Result<f64, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
     pub async fn pressure_at(&'a self) -> Result<f64, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
     pub async fn biome_at(&'a self) -> Result<String, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_string(result)?;
         Ok(return_value)
     }
 
     pub async fn position(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
     pub async fn velocity(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
     pub async fn rotation(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
     pub async fn direction(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
     pub async fn angular_velocity(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
@@ -1991,21 +1991,21 @@ pub struct Contract<'a> {
 impl<'a> Contract<'a> {
     // methods
     pub async fn cancel(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
     pub async fn accept(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
     pub async fn decline(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
@@ -2472,42 +2472,42 @@ pub struct Control<'a> {
 impl<'a> Control<'a> {
     // methods
     pub async fn activate_next_stage(&'a self) -> Result<(/*list*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_list(result)?;
         Ok(return_value)
     }
 
     pub async fn get_action_group(&'a self) -> Result<bool, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_bool(result)?;
         Ok(return_value)
     }
 
     pub async fn set_action_group(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
     pub async fn toggle_action_group(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
     pub async fn add_node(&'a self) -> Result<Node<'a>, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_class(result)?;
         Ok(Node{id: return_value, conn: &self.conn})
     }
 
     pub async fn remove_nodes(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
@@ -3721,7 +3721,7 @@ pub struct Decoupler<'a> {
 impl<'a> Decoupler<'a> {
     // methods
     pub async fn decouple(&'a self) -> Result<Vessel<'a>, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_class(result)?;
         Ok(Vessel{id: return_value, conn: &self.conn})
@@ -3786,28 +3786,28 @@ pub struct DockingPort<'a> {
 impl<'a> DockingPort<'a> {
     // methods
     pub async fn undock(&'a self) -> Result<Vessel<'a>, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_class(result)?;
         Ok(Vessel{id: return_value, conn: &self.conn})
     }
 
     pub async fn position(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
     pub async fn direction(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
     pub async fn rotation(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
@@ -3920,7 +3920,7 @@ pub struct Engine<'a> {
 impl<'a> Engine<'a> {
     // methods
     pub async fn toggle_mode(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
@@ -4339,28 +4339,28 @@ pub struct Experiment<'a> {
 impl<'a> Experiment<'a> {
     // methods
     pub async fn run(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
     pub async fn transmit(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
     pub async fn dump(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
     pub async fn reset(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
@@ -4480,7 +4480,7 @@ pub struct Fairing<'a> {
 impl<'a> Fairing<'a> {
     // methods
     pub async fn jettison(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
@@ -4523,7 +4523,7 @@ pub struct Flight<'a> {
 impl<'a> Flight<'a> {
     // methods
     pub async fn simulate_aerodynamic_force_at(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
@@ -5039,7 +5039,7 @@ pub struct Force<'a> {
 impl<'a> Force<'a> {
     // methods
     pub async fn remove(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
@@ -5233,7 +5233,7 @@ pub struct LaunchClamp<'a> {
 impl<'a> LaunchClamp<'a> {
     // methods
     pub async fn release(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
@@ -5437,70 +5437,70 @@ pub struct Module<'a> {
 impl<'a> Module<'a> {
     // methods
     pub async fn has_field(&'a self) -> Result<bool, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_bool(result)?;
         Ok(return_value)
     }
 
     pub async fn get_field(&'a self) -> Result<String, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_string(result)?;
         Ok(return_value)
     }
 
     pub async fn set_field_int(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
     pub async fn set_field_float(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
     pub async fn set_field_string(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
     pub async fn reset_field(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
     pub async fn has_event(&'a self) -> Result<bool, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_bool(result)?;
         Ok(return_value)
     }
 
     pub async fn trigger_event(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
     pub async fn has_action(&'a self) -> Result<bool, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_bool(result)?;
         Ok(return_value)
     }
 
     pub async fn set_action(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
@@ -5576,35 +5576,35 @@ pub struct Node<'a> {
 impl<'a> Node<'a> {
     // methods
     pub async fn burn_vector(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
     pub async fn remaining_burn_vector(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
     pub async fn remove(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
     pub async fn position(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
     pub async fn direction(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
@@ -5810,119 +5810,119 @@ pub struct Orbit<'a> {
 impl<'a> Orbit<'a> {
     // methods
     pub async fn reference_plane_normal(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
     pub async fn reference_plane_direction(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
     pub async fn mean_anomaly_at_ut(&'a self) -> Result<f64, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
     pub async fn radius_at_true_anomaly(&'a self) -> Result<f64, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
     pub async fn true_anomaly_at_radius(&'a self) -> Result<f64, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
     pub async fn true_anomaly_at_ut(&'a self) -> Result<f64, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
     pub async fn ut_at_true_anomaly(&'a self) -> Result<f64, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
     pub async fn eccentric_anomaly_at_ut(&'a self) -> Result<f64, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
     pub async fn orbital_speed_at(&'a self) -> Result<f64, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
     pub async fn radius_at(&'a self) -> Result<f64, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
     pub async fn position_at(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
     pub async fn time_of_closest_approach(&'a self) -> Result<f64, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
     pub async fn distance_at_closest_approach(&'a self) -> Result<f64, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
     pub async fn list_closest_approaches(&'a self) -> Result<(/*list*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_list(result)?;
         Ok(return_value)
     }
 
     pub async fn true_anomaly_at_an(&'a self) -> Result<f64, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
     pub async fn true_anomaly_at_dn(&'a self) -> Result<f64, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
     pub async fn relative_inclination(&'a self) -> Result<f64, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
@@ -6207,14 +6207,14 @@ pub struct Parachute<'a> {
 impl<'a> Parachute<'a> {
     // methods
     pub async fn deploy(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
     pub async fn arm(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
@@ -6331,56 +6331,56 @@ pub struct Part<'a> {
 impl<'a> Part<'a> {
     // methods
     pub async fn position(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
     pub async fn center_of_mass(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
     pub async fn bounding_box(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
     pub async fn direction(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
     pub async fn velocity(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
     pub async fn rotation(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
     pub async fn add_force(&'a self) -> Result<Force<'a>, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_class(result)?;
         Ok(Force{id: return_value, conn: &self.conn})
     }
 
     pub async fn instantaneous_force(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
@@ -7128,49 +7128,49 @@ pub struct Parts<'a> {
 impl<'a> Parts<'a> {
     // methods
     pub async fn with_name(&'a self) -> Result<(/*list*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_list(result)?;
         Ok(return_value)
     }
 
     pub async fn with_title(&'a self) -> Result<(/*list*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_list(result)?;
         Ok(return_value)
     }
 
     pub async fn with_tag(&'a self) -> Result<(/*list*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_list(result)?;
         Ok(return_value)
     }
 
     pub async fn with_module(&'a self) -> Result<(/*list*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_list(result)?;
         Ok(return_value)
     }
 
     pub async fn in_stage(&'a self) -> Result<(/*list*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_list(result)?;
         Ok(return_value)
     }
 
     pub async fn in_decouple_stage(&'a self) -> Result<(/*list*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_list(result)?;
         Ok(return_value)
     }
 
     pub async fn modules_with_name(&'a self) -> Result<(/*list*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_list(result)?;
         Ok(return_value)
@@ -8079,14 +8079,14 @@ pub struct ReferenceFrame<'a> {
 impl<'a> ReferenceFrame<'a> {
     // methods
     pub async fn create_relative(&'a self) -> Result<ReferenceFrame<'a>, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_class(result)?;
         Ok(ReferenceFrame{id: return_value, conn: &self.conn})
     }
 
     pub async fn create_hybrid(&'a self) -> Result<ReferenceFrame<'a>, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_class(result)?;
         Ok(ReferenceFrame{id: return_value, conn: &self.conn})
@@ -8213,56 +8213,56 @@ pub struct ResourceConverter<'a> {
 impl<'a> ResourceConverter<'a> {
     // methods
     pub async fn active(&'a self) -> Result<bool, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_bool(result)?;
         Ok(return_value)
     }
 
     pub async fn name(&'a self) -> Result<String, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_string(result)?;
         Ok(return_value)
     }
 
     pub async fn start(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
     pub async fn stop(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
     pub async fn state(&'a self) -> Result<(/*enum*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_enumeration(result)?;
         Ok(return_value)
     }
 
     pub async fn status_info(&'a self) -> Result<String, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_string(result)?;
         Ok(return_value)
     }
 
     pub async fn inputs(&'a self) -> Result<(/*list*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_list(result)?;
         Ok(return_value)
     }
 
     pub async fn outputs(&'a self) -> Result<(/*list*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_list(result)?;
         Ok(return_value)
@@ -8470,7 +8470,7 @@ pub struct ResourceTransfer<'a> {
 impl<'a> ResourceTransfer<'a> {
     // methods
     pub async fn start(&'a self) -> Result<ResourceTransfer<'a>, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_class(result)?;
         Ok(ResourceTransfer{id: return_value, conn: &self.conn})
@@ -8513,42 +8513,42 @@ pub struct Resources<'a> {
 impl<'a> Resources<'a> {
     // methods
     pub async fn with_resource(&'a self) -> Result<(/*list*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_list(result)?;
         Ok(return_value)
     }
 
     pub async fn has_resource(&'a self) -> Result<bool, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_bool(result)?;
         Ok(return_value)
     }
 
     pub async fn max(&'a self) -> Result<f32, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_float(result)?;
         Ok(return_value)
     }
 
     pub async fn amount(&'a self) -> Result<f32, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_float(result)?;
         Ok(return_value)
     }
 
     pub async fn density(&'a self) -> Result<f32, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_float(result)?;
         Ok(return_value)
     }
 
     pub async fn flow_mode(&'a self) -> Result<(/*enum*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_enumeration(result)?;
         Ok(return_value)
@@ -8912,35 +8912,35 @@ pub struct Thruster<'a> {
 impl<'a> Thruster<'a> {
     // methods
     pub async fn thrust_position(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
     pub async fn thrust_direction(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
     pub async fn initial_thrust_position(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
     pub async fn initial_thrust_direction(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
     pub async fn gimbal_position(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
@@ -9005,63 +9005,63 @@ pub struct Vessel<'a> {
 impl<'a> Vessel<'a> {
     // methods
     pub async fn recover(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
     pub async fn flight(&'a self) -> Result<Flight<'a>, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_class(result)?;
         Ok(Flight{id: return_value, conn: &self.conn})
     }
 
     pub async fn resources_in_decouple_stage(&'a self) -> Result<Resources<'a>, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_class(result)?;
         Ok(Resources{id: return_value, conn: &self.conn})
     }
 
     pub async fn position(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
     pub async fn bounding_box(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
     pub async fn velocity(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
     pub async fn rotation(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
     pub async fn direction(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
     pub async fn angular_velocity(&'a self) -> Result<(/*tuple*/), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
@@ -9508,7 +9508,7 @@ pub struct Waypoint<'a> {
 impl<'a> Waypoint<'a> {
     // methods
     pub async fn remove(&'a self) -> Result<(), error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
@@ -9829,14 +9829,14 @@ pub struct WaypointManager<'a> {
 impl<'a> WaypointManager<'a> {
     // methods
     pub async fn add_waypoint(&'a self) -> Result<Waypoint<'a>, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_class(result)?;
         Ok(Waypoint{id: return_value, conn: &self.conn})
     }
 
     pub async fn add_waypoint_at_altitude(&'a self) -> Result<Waypoint<'a>, error::Error> {
-        let arguments = Vec::new();
+        let mut arguments = Vec::new();
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_class(result)?;
         Ok(Waypoint{id: return_value, conn: &self.conn})
