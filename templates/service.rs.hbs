@@ -134,7 +134,7 @@ impl<'a> {{{ class.name }}}<'a> {
 impl<'a> decoder::KRPCDecode<'a> for {{{ class.name }}}<'a> {
     fn krpc_decode(input: Vec<u8>, conn: &'a Connection) -> Result<Self, decoder::Error> {
         Ok(Self {
-            id: 0,
+            id: decoder::decode_class(input, conn)?,
             conn
         })
     }
