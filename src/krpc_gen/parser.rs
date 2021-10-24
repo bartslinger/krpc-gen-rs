@@ -262,7 +262,7 @@ fn argument_type(parameter: &original::Parameter) -> String {
         original::Code::Double => "f64".to_string(),
         original::Code::Sint32 => "i32".to_string(),
         original::Code::Uint32 => "u32".to_string(),
-        original::Code::Enumeration => "(/*enum*/)".to_string(),
+        original::Code::Enumeration => parameter.r#type.name.clone().unwrap(),
         original::Code::List => "(/*list*/)".to_string(),
         original::Code::Dictionary => "(/*dict*/)".to_string(),
         original::Code::Set => "(/*set*/)".to_string(),
@@ -298,7 +298,7 @@ fn convert_single_argument(parameter: &original::Parameter, position: u64) -> ou
         original::Code::Double => "encode_double".to_string(),
         original::Code::Sint32 => "encode_sint32".to_string(),
         original::Code::Uint32 => "encode_uint32".to_string(),
-        original::Code::Enumeration => "encode_enumeration".to_string(),
+        original::Code::Enumeration => "encode_u64".to_string(),
         original::Code::List => "encode_list".to_string(),
         original::Code::Dictionary => "encode_dictionary".to_string(),
         original::Code::Set => "encode_set".to_string(),
@@ -307,22 +307,9 @@ fn convert_single_argument(parameter: &original::Parameter, position: u64) -> ou
     };
     let value = match parameter.r#type.code {
         original::Code::Class => parameter.name.to_case(Case::Snake) + ".id",
+        original::Code::Enumeration => parameter.name.to_case(Case::Snake) + " as u64",
         _ => parameter.name.to_case(Case::Snake),
     };
-    // let value = match parameter.r#type.code {
-    //     original::Code::String => "".to_string(),
-    //     original::Code::Bool => "".to_string(),
-    //     original::Code::Float => "0.0".to_string(),
-    //     original::Code::Double => "0.0".to_string(),
-    //     original::Code::Sint32 => "".to_string(),
-    //     original::Code::Uint32 => "".to_string(),
-    //     original::Code::Enumeration => "".to_string(),
-    //     original::Code::List => "".to_string(),
-    //     original::Code::Dictionary => "".to_string(),
-    //     original::Code::Set => "".to_string(),
-    //     original::Code::Tuple => "".to_string(),
-    //     original::Code::Class => "0".to_string(), //parameter.r#type.name.clone().unwrap(),
-    // };
     output::Argument {
         position,
         encoder_function,

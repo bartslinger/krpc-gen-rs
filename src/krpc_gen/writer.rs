@@ -21,6 +21,6 @@ pub fn write_to_file(service_name: &str, path: &std::path::Path, output_structur
 
     handlebars.render_to_write("template", &data, &mut output_file).unwrap();
     
-    let mut output_test_file = File::create("generated.rs").unwrap();
-    handlebars.render_to_write("template", &data, &mut output_test_file).unwrap();
+    // let mut output_test_file = File::create("output/generated.rs").unwrap();
+    // handlebars.render_to_write("template", &data, &mut output_test_file).unwrap();
 }
