@@ -152,6 +152,7 @@ pub fn create_output_structure(input_structure: &original::Content) -> output::O
     let mut service_methods = Vec::<output::Method>::new();
     let mut service_getters_setters = Vec::<output::Method>::new();
     let mut classes = HashMap::<String, output::Class>::new();
+    let mut enumerations = Vec::<output::Enumeration>::new();
     for proc in &input_structure.procedures {
         let procedure_type = get_procedure_type(proc.0);
         match &procedure_type {
@@ -184,6 +185,20 @@ pub fn create_output_structure(input_structure: &original::Content) -> output::O
         }
     }
     
+    for e in &input_structure.enumerations {
+        let enum_values: Vec<output::EnumerationValue> = e.1.values.iter()
+            .map(|v| output::EnumerationValue {
+                id: v.value,
+                name: v.name.clone(),
+            })
+            .collect();
+        let enumeration = output::Enumeration {
+            name: e.0.to_string(),
+            values: enum_values,
+        };
+        enumerations.push(enumeration);
+    }
+    
     // Sort lists
     service_methods.sort();
     service_getters_setters.sort();
@@ -198,6 +213,7 @@ pub fn create_output_structure(input_structure: &original::Content) -> output::O
         methods: service_methods,
         getters_setters: service_getters_setters,
         classes: classes,
+        enumerations: enumerations,
     }
 }
 

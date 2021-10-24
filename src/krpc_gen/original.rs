@@ -7,6 +7,26 @@ use serde::Deserialize;
 pub struct Content {
     id: u64,
     pub procedures: HashMap<String, Procedure>,
+    pub classes: HashMap<String, Class>,
+    pub enumerations: HashMap<String, Enumeration>,
+}
+
+#[derive(Deserialize, Debug, Clone)]
+pub struct Class {
+    // documentation: String,
+}
+
+#[derive(Deserialize, Debug, Clone)]
+pub struct Enumeration {
+    // documentation: String,
+    pub values: Vec<EnumerationValue>,
+}
+
+#[derive(Deserialize, Debug, Clone)]
+pub struct EnumerationValue {
+    pub name: String,
+    pub value: u64,
+    // documentation: String,
 }
 
 #[derive(Deserialize, Debug, Clone)]

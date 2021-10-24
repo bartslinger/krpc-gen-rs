@@ -6,6 +6,7 @@ pub struct OutputStructure {
     pub methods: Vec<Method>,
     pub getters_setters: Vec<Method>,
     pub classes: HashMap<String, Class>,
+    pub enumerations: Vec<Enumeration>,
 }
 
 #[derive(Serialize, Debug, Clone, Default)]
@@ -14,6 +15,18 @@ pub struct Class {
     pub methods: Vec<Method>,
     pub getters_setters: Vec<Method>,
     pub static_methods: Vec<Method>,
+}
+
+#[derive(Serialize, Debug, Clone, Default)]
+pub struct Enumeration {
+    pub name: String,
+    pub values: Vec<EnumerationValue>,
+}
+
+#[derive(Serialize, Debug, Clone, Default)]
+pub struct EnumerationValue {
+    pub id: u64,
+    pub name: String,
 }
 
 #[derive(Serialize, Debug, Clone, Default, Eq, PartialEq, Ord, PartialOrd)]

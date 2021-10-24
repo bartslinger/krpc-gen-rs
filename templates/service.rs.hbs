@@ -115,3 +115,12 @@ impl<'a> {{{ class.name }}}<'a> {
 }
 
 {{/each}}
+
+{{#each enumerations as |enumeration| }}
+pub enum {{{enumeration.name}}}{
+    {{#each enumeration.values as |value|}}
+    {{{value.name}}} = {{{ value.id }}},
+    {{/each}}    
+}
+
+{{/each}}

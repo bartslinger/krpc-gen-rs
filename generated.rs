@@ -11696,3 +11696,212 @@ impl<'a> Wheel<'a> {
     // static methods
 }
 
+enum CrewMemberType{
+    Applicant = 0,
+    Crew = 1,
+    Tourist = 2,
+    Unowned = 3,
+}
+
+enum GameMode{
+    Sandbox = 0,
+    Career = 1,
+    Science = 2,
+    ScienceSandbox = 3,
+    Mission = 4,
+    MissionBuilder = 5,
+    Scenario = 6,
+    ScenarioNonResumable = 7,
+}
+
+enum CameraMode{
+    Automatic = 0,
+    Free = 1,
+    Chase = 2,
+    Locked = 3,
+    Orbital = 4,
+    IVA = 5,
+    Map = 6,
+}
+
+enum ContractState{
+    Active = 0,
+    Canceled = 1,
+    Completed = 2,
+    DeadlineExpired = 3,
+    Declined = 4,
+    Failed = 5,
+    Generated = 6,
+    Offered = 7,
+    OfferExpired = 8,
+    Withdrawn = 9,
+}
+
+enum ControlSource{
+    Kerbal = 0,
+    Probe = 1,
+    None = 2,
+}
+
+enum ControlState{
+    Full = 0,
+    Partial = 1,
+    None = 2,
+}
+
+enum SolarPanelState{
+    Extended = 0,
+    Retracted = 1,
+    Extending = 2,
+    Retracting = 3,
+    Broken = 4,
+}
+
+enum VesselType{
+    Base = 0,
+    Debris = 1,
+    Lander = 2,
+    Plane = 3,
+    Probe = 4,
+    Relay = 5,
+    Rover = 6,
+    Ship = 7,
+    Station = 8,
+}
+
+enum ResourceHarvesterState{
+    Deploying = 0,
+    Deployed = 1,
+    Retracting = 2,
+    Retracted = 3,
+    Active = 4,
+}
+
+enum WheelState{
+    Deployed = 0,
+    Retracted = 1,
+    Deploying = 2,
+    Retracting = 3,
+    Broken = 4,
+}
+
+enum ResourceFlowMode{
+    Vessel = 0,
+    Stage = 1,
+    Adjacent = 2,
+    None = 3,
+}
+
+enum RadiatorState{
+    Extended = 0,
+    Retracted = 1,
+    Extending = 2,
+    Retracting = 3,
+    Broken = 4,
+}
+
+enum SpeedMode{
+    Orbit = 0,
+    Surface = 1,
+    Target = 2,
+}
+
+enum WarpMode{
+    Rails = 0,
+    Physics = 1,
+    None = 2,
+}
+
+enum CommLinkType{
+    Home = 0,
+    Control = 1,
+    Relay = 2,
+}
+
+enum ControlInputMode{
+    Additive = 0,
+    Override = 1,
+}
+
+enum AntennaState{
+    Deployed = 0,
+    Retracted = 1,
+    Deploying = 2,
+    Retracting = 3,
+    Broken = 4,
+}
+
+enum DockingPortState{
+    Ready = 0,
+    Docked = 1,
+    Docking = 2,
+    Undocking = 3,
+    Shielded = 4,
+    Moving = 5,
+}
+
+enum LegState{
+    Deployed = 0,
+    Retracted = 1,
+    Deploying = 2,
+    Retracting = 3,
+    Broken = 4,
+}
+
+enum ParachuteState{
+    Stowed = 0,
+    Armed = 1,
+    Active = 2,
+    SemiDeployed = 3,
+    Deployed = 4,
+    Cut = 5,
+}
+
+enum ResourceConverterState{
+    Running = 0,
+    Idle = 1,
+    MissingResource = 2,
+    StorageFull = 3,
+    Capacity = 4,
+    Unknown = 5,
+}
+
+enum CargoBayState{
+    Open = 0,
+    Closed = 1,
+    Opening = 2,
+    Closing = 3,
+}
+
+enum SASMode{
+    StabilityAssist = 0,
+    Maneuver = 1,
+    Prograde = 2,
+    Retrograde = 3,
+    Normal = 4,
+    AntiNormal = 5,
+    Radial = 6,
+    AntiRadial = 7,
+    Target = 8,
+    AntiTarget = 9,
+}
+
+enum MotorState{
+    Idle = 0,
+    Running = 1,
+    Disabled = 2,
+    Inoperable = 3,
+    NotEnoughResources = 4,
+}
+
+enum VesselSituation{
+    PreLaunch = 0,
+    Orbiting = 1,
+    SubOrbital = 2,
+    Escaping = 3,
+    Flying = 4,
+    Landed = 5,
+    Splashed = 6,
+    Docked = 7,
+}
+
