@@ -38,44 +38,23 @@ impl<'a> {{{ service_name }}}<'a> {
 
     {{/each}}
 
-    // getters
-    {{#each service_getters as |getter|}}
-    pub async fn {{{ getter.name }}}(&'a self{{{ getter.arguments_signature }}}) -> Result<{{{ getter.return_type_signature }}}, error::Error> {
-        {{#if getter.arguments }}
+    // getters and setters
+    {{#each service_getters_setters as |method|}}
+    pub async fn {{{ method.name }}}(&'a self{{{ method.arguments_signature }}}) -> Result<{{{ method.return_type_signature }}}, error::Error> {
+        {{#if method.arguments }}
         let mut arguments = Vec::new();
         {{else}}
         let arguments = Vec::new();
         {{/if}}
-        {{#each getter.arguments as |argument| }}
+        {{#each method.arguments as |argument| }}
         arguments.push(schema::Argument {
             position: {{{argument.position}}},
             value: encoder::{{{ argument.encoder_function }}}({{{ argument.value }}})?,
         });
         {{/each}}
-        let result = self.conn.execute_procedure("{{{ ../service_name }}}", "{{{ getter.procedure }}}", arguments).await?;
+        let result = self.conn.execute_procedure("{{{ ../service_name }}}", "{{{ method.procedure }}}", arguments).await?;
         let return_value = decoder::{{{ decoder_function }}}(result)?;
-        Ok({{{ getter.return_value }}})
-    }
-
-    {{/each}}
-    
-    // setters
-    {{#each service_setters as |setter|}}
-    pub async fn {{{ setter.name }}}(&'a self{{{ setter.arguments_signature }}}) -> Result<{{{ setter.return_type_signature }}}, error::Error> {
-        {{#if setter.arguments }}
-        let mut arguments = Vec::new();
-        {{else}}
-        let arguments = Vec::new();
-        {{/if}}
-        {{#each setter.arguments as |argument| }}
-        arguments.push(schema::Argument {
-            position: {{{argument.position}}},
-            value: encoder::{{{ argument.encoder_function }}}({{{ argument.value }}})?,
-        });
-        {{/each}}
-        let result = self.conn.execute_procedure("{{{ ../service_name }}}", "{{{ getter.procedure }}}", arguments).await?;
-        let return_value = decoder::{{{ decoder_function }}}(result)?;
-        Ok({{{ setter.return_value }}})
+        Ok({{{ method.return_value }}})
     }
 
     {{/each}}
@@ -103,29 +82,29 @@ impl<'a> {{{ class.name }}}<'a> {
             value: encoder::{{{ argument.encoder_function }}}({{{ argument.value }}})?,
         });
         {{/each}}
-        let result = self.conn.execute_procedure("{{{ ../service_name }}}", "{{{ getter.procedure }}}", arguments).await?;
+        let result = self.conn.execute_procedure("{{{ ../../service_name }}}", "{{{ method.procedure }}}", arguments).await?;
         let return_value = decoder::{{{ decoder_function }}}(result)?;
         Ok({{{ method.return_value }}})
     }
 
     {{/each}}
-    // getters
-    {{#each class.getters as |getter| }}
-    pub async fn {{{ getter.name }}}(&'a self{{{ getter.arguments_signature}}}) -> Result<{{{ getter.return_type_signature }}}, error::Error> {
-        {{#if getter.arguments }}
+    // getters and setters
+    {{#each class.getters_setters as |method| }}
+    pub async fn {{{ method.name }}}(&'a self{{{ method.arguments_signature}}}) -> Result<{{{ method.return_type_signature }}}, error::Error> {
+        {{#if method.arguments }}
         let mut arguments = Vec::new();
         {{else}}
         let arguments = Vec::new();
         {{/if}}
-        {{#each getter.arguments as |argument| }}
+        {{#each method.arguments as |argument| }}
         arguments.push(schema::Argument {
             position: {{{argument.position}}},
             value: encoder::{{{ argument.encoder_function }}}({{{ argument.value }}})?,
         });
         {{/each}}
-        let result = self.conn.execute_procedure("{{{ ../service_name }}}", "{{{ getter.procedure }}}", arguments).await?;
+        let result = self.conn.execute_procedure("{{{ ../../service_name }}}", "{{{ method.procedure }}}", arguments).await?;
         let return_value = decoder::{{{ decoder_function }}}(result)?;
-        Ok({{{ getter.return_value }}})
+        Ok({{{ method.return_value }}})
     }
 
     {{/each}}

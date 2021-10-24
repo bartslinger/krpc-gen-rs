@@ -4,8 +4,7 @@ use serde::Serialize;
 #[derive(Serialize, Debug, Clone, Default)]
 pub struct OutputStructure {
     pub methods: Vec<Method>,
-    pub getters: Vec<Method>,
-    pub setters: Vec<Method>,
+    pub getters_setters: Vec<Method>,
     pub classes: HashMap<String, Class>,
 }
 
@@ -13,8 +12,7 @@ pub struct OutputStructure {
 pub struct Class {
     pub name: String,
     pub methods: Vec<Method>,
-    pub getters: Vec<Method>,
-    pub setters: Vec<Method>,
+    pub getters_setters: Vec<Method>,
     pub static_methods: Vec<Method>,
 }
 

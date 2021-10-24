@@ -150,8 +150,7 @@ fn get_procedure_type(procedure_name: &str) -> ProcedureType {
 
 pub fn create_output_structure(input_structure: &original::Content) -> output::OutputStructure {
     let mut service_methods = Vec::<output::Method>::new();
-    let mut service_getters = Vec::<output::Method>::new();
-    let mut service_setters = Vec::<output::Method>::new();
+    let mut service_getters_setters = Vec::<output::Method>::new();
     let mut classes = HashMap::<String, output::Class>::new();
     for proc in &input_structure.procedures {
         let procedure_type = get_procedure_type(proc.0);
@@ -160,10 +159,10 @@ pub fn create_output_structure(input_structure: &original::Content) -> output::O
                 service_methods.push(convert_method(x, &proc.1));
             },
             ProcedureType::PropertyGetter(x) => {
-                service_getters.push(convert_method(x, &proc.1));
+                service_getters_setters.push(convert_method(x, &proc.1));
             },
             ProcedureType::PropertySetter(x) => {
-                service_setters.push(convert_method(x, &proc.1));
+                service_getters_setters.push(convert_method(x, &proc.1));
             },
             ProcedureType::ClassMethod(x) => {
                 add_class_if_nonexistent(&mut classes, &x.class);
@@ -171,11 +170,11 @@ pub fn create_output_structure(input_structure: &original::Content) -> output::O
             },
             ProcedureType::ClassPropertyGetter(x) => {
                 add_class_if_nonexistent(&mut classes, &x.class);
-                classes.get_mut(&x.class).unwrap().getters.push(convert_method(x, &proc.1));
+                classes.get_mut(&x.class).unwrap().getters_setters.push(convert_method(x, &proc.1));
             },
             ProcedureType::ClassPropertySetter(x) => {
                 add_class_if_nonexistent(&mut classes, &x.class);
-                classes.get_mut(&x.class).unwrap().getters.push(convert_method(x, &proc.1));
+                classes.get_mut(&x.class).unwrap().getters_setters.push(convert_method(x, &proc.1));
             },
             ProcedureType::StaticClassMethod(x) => {
                 add_class_if_nonexistent(&mut classes, &x.class);
@@ -187,20 +186,17 @@ pub fn create_output_structure(input_structure: &original::Content) -> output::O
     
     // Sort lists
     service_methods.sort();
-    service_getters.sort();
-    service_setters.sort();
+    service_getters_setters.sort();
     
     for (_, class) in &mut classes {
         class.methods.sort();
-        class.getters.sort();
-        class.setters.sort();
+        class.getters_setters.sort();
         class.static_methods.sort();
     }
     
     output::OutputStructure {
         methods: service_methods,
-        getters: service_getters,
-        setters: service_setters,
+        getters_setters: service_getters_setters,
         classes: classes,
     }
 }
@@ -210,8 +206,7 @@ fn add_class_if_nonexistent(classes: &mut HashMap<String, output::Class>, class_
         classes.insert(class_name.clone(), output::Class {
             name: class_name.clone(),
             methods: vec![],
-            getters: vec![],
-            setters: vec![],
+            getters_setters: vec![],
             static_methods: vec![],
         });
     }
