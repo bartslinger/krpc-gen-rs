@@ -25,43 +25,87 @@ impl<'a> SpaceCenter<'a> {
         Ok(())
     }
 
-    pub async fn launchable_vessels(&'a self) -> Result<(/*list*/), error::Error> {
+    pub async fn launchable_vessels(&'a self, craft_directory: String) -> Result<(/*list*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_string(craft_directory)?,
+        });
         let result = self.conn.execute_procedure("SpaceCenter", "LaunchableVessels", arguments).await?;
         let return_value = decoder::decode_list(result)?;
         Ok(return_value)
     }
 
-    pub async fn launch_vessel(&'a self) -> Result<(), error::Error> {
+    pub async fn launch_vessel(&'a self, craft_directory: String, name: String, launch_site: String, recover: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_string(craft_directory)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_string(name)?,
+        });
+        arguments.push(schema::Argument {
+            position: 2,
+            value: encoder::encode_string(launch_site)?,
+        });
+        arguments.push(schema::Argument {
+            position: 3,
+            value: encoder::encode_bool(recover)?,
+        });
         let result = self.conn.execute_procedure("SpaceCenter", "LaunchVessel", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
-    pub async fn launch_vessel_from_vab(&'a self) -> Result<(), error::Error> {
+    pub async fn launch_vessel_from_vab(&'a self, name: String, recover: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_string(name)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_bool(recover)?,
+        });
         let result = self.conn.execute_procedure("SpaceCenter", "LaunchVesselFromVAB", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
-    pub async fn launch_vessel_from_sph(&'a self) -> Result<(), error::Error> {
+    pub async fn launch_vessel_from_sph(&'a self, name: String, recover: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_string(name)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_bool(recover)?,
+        });
         let result = self.conn.execute_procedure("SpaceCenter", "LaunchVesselFromSPH", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
-    pub async fn save(&'a self) -> Result<(), error::Error> {
+    pub async fn save(&'a self, name: String) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_string(name)?,
+        });
         let result = self.conn.execute_procedure("SpaceCenter", "Save", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
-    pub async fn load(&'a self) -> Result<(), error::Error> {
+    pub async fn load(&'a self, name: String) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_string(name)?,
+        });
         let result = self.conn.execute_procedure("SpaceCenter", "Load", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
@@ -81,57 +125,149 @@ impl<'a> SpaceCenter<'a> {
         Ok(())
     }
 
-    pub async fn can_rails_warp_at(&'a self) -> Result<bool, error::Error> {
+    pub async fn can_rails_warp_at(&'a self, factor: i32) -> Result<bool, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_sint32(factor)?,
+        });
         let result = self.conn.execute_procedure("SpaceCenter", "CanRailsWarpAt", arguments).await?;
         let return_value = decoder::decode_bool(result)?;
         Ok(return_value)
     }
 
-    pub async fn warp_to(&'a self) -> Result<(), error::Error> {
+    pub async fn warp_to(&'a self, ut: f64, max_rails_rate: f32, max_physics_rate: f32) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_double(ut)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_float(max_rails_rate)?,
+        });
+        arguments.push(schema::Argument {
+            position: 2,
+            value: encoder::encode_float(max_physics_rate)?,
+        });
         let result = self.conn.execute_procedure("SpaceCenter", "WarpTo", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
-    pub async fn transform_position(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn transform_position(&'a self, position: (/*tuple*/), from: &ReferenceFrame<'_>, to: &ReferenceFrame<'_>) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_tuple(position)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(from.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 2,
+            value: encoder::encode_u64(to.id)?,
+        });
         let result = self.conn.execute_procedure("SpaceCenter", "TransformPosition", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
-    pub async fn transform_direction(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn transform_direction(&'a self, direction: (/*tuple*/), from: &ReferenceFrame<'_>, to: &ReferenceFrame<'_>) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_tuple(direction)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(from.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 2,
+            value: encoder::encode_u64(to.id)?,
+        });
         let result = self.conn.execute_procedure("SpaceCenter", "TransformDirection", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
-    pub async fn transform_rotation(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn transform_rotation(&'a self, rotation: (/*tuple*/), from: &ReferenceFrame<'_>, to: &ReferenceFrame<'_>) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_tuple(rotation)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(from.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 2,
+            value: encoder::encode_u64(to.id)?,
+        });
         let result = self.conn.execute_procedure("SpaceCenter", "TransformRotation", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
-    pub async fn transform_velocity(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn transform_velocity(&'a self, position: (/*tuple*/), velocity: (/*tuple*/), from: &ReferenceFrame<'_>, to: &ReferenceFrame<'_>) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_tuple(position)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_tuple(velocity)?,
+        });
+        arguments.push(schema::Argument {
+            position: 2,
+            value: encoder::encode_u64(from.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 3,
+            value: encoder::encode_u64(to.id)?,
+        });
         let result = self.conn.execute_procedure("SpaceCenter", "TransformVelocity", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
-    pub async fn raycast_distance(&'a self) -> Result<f64, error::Error> {
+    pub async fn raycast_distance(&'a self, position: (/*tuple*/), direction: (/*tuple*/), reference_frame: &ReferenceFrame<'_>) -> Result<f64, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_tuple(position)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_tuple(direction)?,
+        });
+        arguments.push(schema::Argument {
+            position: 2,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("SpaceCenter", "RaycastDistance", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
-    pub async fn raycast_part(&'a self) -> Result<Part<'a>, error::Error> {
+    pub async fn raycast_part(&'a self, position: (/*tuple*/), direction: (/*tuple*/), reference_frame: &ReferenceFrame<'_>) -> Result<Part<'a>, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_tuple(position)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_tuple(direction)?,
+        });
+        arguments.push(schema::Argument {
+            position: 2,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("SpaceCenter", "RaycastPart", arguments).await?;
         let return_value = decoder::decode_class(result)?;
         Ok(Part{id: return_value, conn: &self.conn})
@@ -308,57 +444,89 @@ impl<'a> SpaceCenter<'a> {
 
     
     // setters
-    pub async fn set_active_vessel(&'a self) -> Result<(), error::Error> {
+    pub async fn set_active_vessel(&'a self, value: &Vessel<'_>) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(value.id)?,
+        });
         let result = self.conn.execute_procedure("SpaceCenter", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
-    pub async fn set_target_body(&'a self) -> Result<(), error::Error> {
+    pub async fn set_target_body(&'a self, value: &CelestialBody<'_>) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(value.id)?,
+        });
         let result = self.conn.execute_procedure("SpaceCenter", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
-    pub async fn set_target_vessel(&'a self) -> Result<(), error::Error> {
+    pub async fn set_target_vessel(&'a self, value: &Vessel<'_>) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(value.id)?,
+        });
         let result = self.conn.execute_procedure("SpaceCenter", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
-    pub async fn set_target_docking_port(&'a self) -> Result<(), error::Error> {
+    pub async fn set_target_docking_port(&'a self, value: &DockingPort<'_>) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(value.id)?,
+        });
         let result = self.conn.execute_procedure("SpaceCenter", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
-    pub async fn set_ui_visible(&'a self) -> Result<(), error::Error> {
+    pub async fn set_ui_visible(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_bool(value)?,
+        });
         let result = self.conn.execute_procedure("SpaceCenter", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
-    pub async fn set_navball(&'a self) -> Result<(), error::Error> {
+    pub async fn set_navball(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_bool(value)?,
+        });
         let result = self.conn.execute_procedure("SpaceCenter", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
-    pub async fn set_rails_warp_factor(&'a self) -> Result<(), error::Error> {
+    pub async fn set_rails_warp_factor(&'a self, value: i32) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_sint32(value)?,
+        });
         let result = self.conn.execute_procedure("SpaceCenter", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
-    pub async fn set_physics_warp_factor(&'a self) -> Result<(), error::Error> {
+    pub async fn set_physics_warp_factor(&'a self, value: i32) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_sint32(value)?,
+        });
         let result = self.conn.execute_procedure("SpaceCenter", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
@@ -376,6 +544,10 @@ impl<'a> Antenna<'a> {
     // methods
     pub async fn transmit(&'a self) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
@@ -383,6 +555,10 @@ impl<'a> Antenna<'a> {
 
     pub async fn cancel(&'a self) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
@@ -433,7 +609,7 @@ impl<'a> Antenna<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_deployed(&'a self) -> Result<(), error::Error> {
+    pub async fn set_deployed(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -441,7 +617,7 @@ impl<'a> Antenna<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "Antenna_set_Deployed", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -470,7 +646,7 @@ impl<'a> Antenna<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_allow_partial(&'a self) -> Result<(), error::Error> {
+    pub async fn set_allow_partial(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -478,7 +654,7 @@ impl<'a> Antenna<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "Antenna_set_AllowPartial", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -566,6 +742,10 @@ impl<'a> AutoPilot<'a> {
     // methods
     pub async fn engage(&'a self) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
@@ -573,6 +753,10 @@ impl<'a> AutoPilot<'a> {
 
     pub async fn disengage(&'a self) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
@@ -580,13 +764,29 @@ impl<'a> AutoPilot<'a> {
 
     pub async fn wait(&'a self) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
-    pub async fn target_pitch_and_heading(&'a self) -> Result<(), error::Error> {
+    pub async fn target_pitch_and_heading(&'a self, pitch: f32, heading: f32) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_float(pitch)?,
+        });
+        arguments.push(schema::Argument {
+            position: 2,
+            value: encoder::encode_float(heading)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
@@ -648,7 +848,7 @@ impl<'a> AutoPilot<'a> {
         Ok(ReferenceFrame{id: return_value, conn: &self.conn})
     }
 
-    pub async fn set_reference_frame(&'a self) -> Result<(), error::Error> {
+    pub async fn set_reference_frame(&'a self, value: &ReferenceFrame<'_>) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -656,7 +856,7 @@ impl<'a> AutoPilot<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_u64(0)?,
+            value: encoder::encode_u64(value.id)?,
         });
         let result = self.conn.execute_procedure("", "AutoPilot_set_ReferenceFrame", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -674,7 +874,7 @@ impl<'a> AutoPilot<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_target_pitch(&'a self) -> Result<(), error::Error> {
+    pub async fn set_target_pitch(&'a self, value: f32) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -682,7 +882,7 @@ impl<'a> AutoPilot<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_float(0.0)?,
+            value: encoder::encode_float(value)?,
         });
         let result = self.conn.execute_procedure("", "AutoPilot_set_TargetPitch", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -700,7 +900,7 @@ impl<'a> AutoPilot<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_target_heading(&'a self) -> Result<(), error::Error> {
+    pub async fn set_target_heading(&'a self, value: f32) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -708,7 +908,7 @@ impl<'a> AutoPilot<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_float(0.0)?,
+            value: encoder::encode_float(value)?,
         });
         let result = self.conn.execute_procedure("", "AutoPilot_set_TargetHeading", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -726,7 +926,7 @@ impl<'a> AutoPilot<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_target_roll(&'a self) -> Result<(), error::Error> {
+    pub async fn set_target_roll(&'a self, value: f32) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -734,7 +934,7 @@ impl<'a> AutoPilot<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_float(0.0)?,
+            value: encoder::encode_float(value)?,
         });
         let result = self.conn.execute_procedure("", "AutoPilot_set_TargetRoll", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -752,7 +952,7 @@ impl<'a> AutoPilot<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_target_direction(&'a self) -> Result<(), error::Error> {
+    pub async fn set_target_direction(&'a self, value: (/*tuple*/)) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -760,7 +960,7 @@ impl<'a> AutoPilot<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_tuple()?,
+            value: encoder::encode_tuple(value)?,
         });
         let result = self.conn.execute_procedure("", "AutoPilot_set_TargetDirection", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -778,7 +978,7 @@ impl<'a> AutoPilot<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_sas(&'a self) -> Result<(), error::Error> {
+    pub async fn set_sas(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -786,7 +986,7 @@ impl<'a> AutoPilot<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "AutoPilot_set_SAS", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -804,7 +1004,7 @@ impl<'a> AutoPilot<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_sas_mode(&'a self) -> Result<(), error::Error> {
+    pub async fn set_sas_mode(&'a self, value: (/*enum*/)) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -812,7 +1012,7 @@ impl<'a> AutoPilot<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_enumeration()?,
+            value: encoder::encode_enumeration(value)?,
         });
         let result = self.conn.execute_procedure("", "AutoPilot_set_SASMode", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -830,7 +1030,7 @@ impl<'a> AutoPilot<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_roll_threshold(&'a self) -> Result<(), error::Error> {
+    pub async fn set_roll_threshold(&'a self, value: f64) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -838,7 +1038,7 @@ impl<'a> AutoPilot<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_double(0.0)?,
+            value: encoder::encode_double(value)?,
         });
         let result = self.conn.execute_procedure("", "AutoPilot_set_RollThreshold", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -856,7 +1056,7 @@ impl<'a> AutoPilot<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_stopping_time(&'a self) -> Result<(), error::Error> {
+    pub async fn set_stopping_time(&'a self, value: (/*tuple*/)) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -864,7 +1064,7 @@ impl<'a> AutoPilot<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_tuple()?,
+            value: encoder::encode_tuple(value)?,
         });
         let result = self.conn.execute_procedure("", "AutoPilot_set_StoppingTime", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -882,7 +1082,7 @@ impl<'a> AutoPilot<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_deceleration_time(&'a self) -> Result<(), error::Error> {
+    pub async fn set_deceleration_time(&'a self, value: (/*tuple*/)) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -890,7 +1090,7 @@ impl<'a> AutoPilot<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_tuple()?,
+            value: encoder::encode_tuple(value)?,
         });
         let result = self.conn.execute_procedure("", "AutoPilot_set_DecelerationTime", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -908,7 +1108,7 @@ impl<'a> AutoPilot<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_attenuation_angle(&'a self) -> Result<(), error::Error> {
+    pub async fn set_attenuation_angle(&'a self, value: (/*tuple*/)) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -916,7 +1116,7 @@ impl<'a> AutoPilot<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_tuple()?,
+            value: encoder::encode_tuple(value)?,
         });
         let result = self.conn.execute_procedure("", "AutoPilot_set_AttenuationAngle", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -934,7 +1134,7 @@ impl<'a> AutoPilot<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_auto_tune(&'a self) -> Result<(), error::Error> {
+    pub async fn set_auto_tune(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -942,7 +1142,7 @@ impl<'a> AutoPilot<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "AutoPilot_set_AutoTune", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -960,7 +1160,7 @@ impl<'a> AutoPilot<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_time_to_peak(&'a self) -> Result<(), error::Error> {
+    pub async fn set_time_to_peak(&'a self, value: (/*tuple*/)) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -968,7 +1168,7 @@ impl<'a> AutoPilot<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_tuple()?,
+            value: encoder::encode_tuple(value)?,
         });
         let result = self.conn.execute_procedure("", "AutoPilot_set_TimeToPeak", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -986,7 +1186,7 @@ impl<'a> AutoPilot<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_overshoot(&'a self) -> Result<(), error::Error> {
+    pub async fn set_overshoot(&'a self, value: (/*tuple*/)) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -994,7 +1194,7 @@ impl<'a> AutoPilot<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_tuple()?,
+            value: encoder::encode_tuple(value)?,
         });
         let result = self.conn.execute_procedure("", "AutoPilot_set_Overshoot", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -1012,7 +1212,7 @@ impl<'a> AutoPilot<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_pitch_pid_gains(&'a self) -> Result<(), error::Error> {
+    pub async fn set_pitch_pid_gains(&'a self, value: (/*tuple*/)) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -1020,7 +1220,7 @@ impl<'a> AutoPilot<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_tuple()?,
+            value: encoder::encode_tuple(value)?,
         });
         let result = self.conn.execute_procedure("", "AutoPilot_set_PitchPIDGains", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -1038,7 +1238,7 @@ impl<'a> AutoPilot<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_roll_pid_gains(&'a self) -> Result<(), error::Error> {
+    pub async fn set_roll_pid_gains(&'a self, value: (/*tuple*/)) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -1046,7 +1246,7 @@ impl<'a> AutoPilot<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_tuple()?,
+            value: encoder::encode_tuple(value)?,
         });
         let result = self.conn.execute_procedure("", "AutoPilot_set_RollPIDGains", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -1064,7 +1264,7 @@ impl<'a> AutoPilot<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_yaw_pid_gains(&'a self) -> Result<(), error::Error> {
+    pub async fn set_yaw_pid_gains(&'a self, value: (/*tuple*/)) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -1072,7 +1272,7 @@ impl<'a> AutoPilot<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_tuple()?,
+            value: encoder::encode_tuple(value)?,
         });
         let result = self.conn.execute_procedure("", "AutoPilot_set_YawPIDGains", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -1104,7 +1304,7 @@ impl<'a> Camera<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_mode(&'a self) -> Result<(), error::Error> {
+    pub async fn set_mode(&'a self, value: (/*enum*/)) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -1112,7 +1312,7 @@ impl<'a> Camera<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_enumeration()?,
+            value: encoder::encode_enumeration(value)?,
         });
         let result = self.conn.execute_procedure("", "Camera_set_Mode", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -1130,7 +1330,7 @@ impl<'a> Camera<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_pitch(&'a self) -> Result<(), error::Error> {
+    pub async fn set_pitch(&'a self, value: f32) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -1138,7 +1338,7 @@ impl<'a> Camera<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_float(0.0)?,
+            value: encoder::encode_float(value)?,
         });
         let result = self.conn.execute_procedure("", "Camera_set_Pitch", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -1156,7 +1356,7 @@ impl<'a> Camera<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_heading(&'a self) -> Result<(), error::Error> {
+    pub async fn set_heading(&'a self, value: f32) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -1164,7 +1364,7 @@ impl<'a> Camera<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_float(0.0)?,
+            value: encoder::encode_float(value)?,
         });
         let result = self.conn.execute_procedure("", "Camera_set_Heading", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -1182,7 +1382,7 @@ impl<'a> Camera<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_distance(&'a self) -> Result<(), error::Error> {
+    pub async fn set_distance(&'a self, value: f32) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -1190,7 +1390,7 @@ impl<'a> Camera<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_float(0.0)?,
+            value: encoder::encode_float(value)?,
         });
         let result = self.conn.execute_procedure("", "Camera_set_Distance", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -1263,7 +1463,7 @@ impl<'a> Camera<'a> {
         Ok(CelestialBody{id: return_value, conn: &self.conn})
     }
 
-    pub async fn set_focussed_body(&'a self) -> Result<(), error::Error> {
+    pub async fn set_focussed_body(&'a self, value: &CelestialBody<'_>) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -1271,7 +1471,7 @@ impl<'a> Camera<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_u64(0)?,
+            value: encoder::encode_u64(value.id)?,
         });
         let result = self.conn.execute_procedure("", "Camera_set_FocussedBody", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -1289,7 +1489,7 @@ impl<'a> Camera<'a> {
         Ok(Vessel{id: return_value, conn: &self.conn})
     }
 
-    pub async fn set_focussed_vessel(&'a self) -> Result<(), error::Error> {
+    pub async fn set_focussed_vessel(&'a self, value: &Vessel<'_>) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -1297,7 +1497,7 @@ impl<'a> Camera<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_u64(0)?,
+            value: encoder::encode_u64(value.id)?,
         });
         let result = self.conn.execute_procedure("", "Camera_set_FocussedVessel", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -1315,7 +1515,7 @@ impl<'a> Camera<'a> {
         Ok(Node{id: return_value, conn: &self.conn})
     }
 
-    pub async fn set_focussed_node(&'a self) -> Result<(), error::Error> {
+    pub async fn set_focussed_node(&'a self, value: &Node<'_>) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -1323,7 +1523,7 @@ impl<'a> Camera<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_u64(0)?,
+            value: encoder::encode_u64(value.id)?,
         });
         let result = self.conn.execute_procedure("", "Camera_set_FocussedNode", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -1377,7 +1577,7 @@ impl<'a> CargoBay<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_open(&'a self) -> Result<(), error::Error> {
+    pub async fn set_open(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -1385,7 +1585,7 @@ impl<'a> CargoBay<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "CargoBay_set_Open", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -1405,134 +1605,354 @@ pub struct CelestialBody<'a> {
 }
 impl<'a> CelestialBody<'a> {
     // methods
-    pub async fn surface_height(&'a self) -> Result<f64, error::Error> {
+    pub async fn surface_height(&'a self, latitude: f64, longitude: f64) -> Result<f64, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_double(latitude)?,
+        });
+        arguments.push(schema::Argument {
+            position: 2,
+            value: encoder::encode_double(longitude)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
-    pub async fn bedrock_height(&'a self) -> Result<f64, error::Error> {
+    pub async fn bedrock_height(&'a self, latitude: f64, longitude: f64) -> Result<f64, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_double(latitude)?,
+        });
+        arguments.push(schema::Argument {
+            position: 2,
+            value: encoder::encode_double(longitude)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
-    pub async fn msl_position(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn msl_position(&'a self, latitude: f64, longitude: f64, reference_frame: &ReferenceFrame<'_>) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_double(latitude)?,
+        });
+        arguments.push(schema::Argument {
+            position: 2,
+            value: encoder::encode_double(longitude)?,
+        });
+        arguments.push(schema::Argument {
+            position: 3,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
-    pub async fn surface_position(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn surface_position(&'a self, latitude: f64, longitude: f64, reference_frame: &ReferenceFrame<'_>) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_double(latitude)?,
+        });
+        arguments.push(schema::Argument {
+            position: 2,
+            value: encoder::encode_double(longitude)?,
+        });
+        arguments.push(schema::Argument {
+            position: 3,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
-    pub async fn bedrock_position(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn bedrock_position(&'a self, latitude: f64, longitude: f64, reference_frame: &ReferenceFrame<'_>) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_double(latitude)?,
+        });
+        arguments.push(schema::Argument {
+            position: 2,
+            value: encoder::encode_double(longitude)?,
+        });
+        arguments.push(schema::Argument {
+            position: 3,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
-    pub async fn position_at_altitude(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn position_at_altitude(&'a self, latitude: f64, longitude: f64, altitude: f64, reference_frame: &ReferenceFrame<'_>) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_double(latitude)?,
+        });
+        arguments.push(schema::Argument {
+            position: 2,
+            value: encoder::encode_double(longitude)?,
+        });
+        arguments.push(schema::Argument {
+            position: 3,
+            value: encoder::encode_double(altitude)?,
+        });
+        arguments.push(schema::Argument {
+            position: 4,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
-    pub async fn latitude_at_position(&'a self) -> Result<f64, error::Error> {
+    pub async fn latitude_at_position(&'a self, position: (/*tuple*/), reference_frame: &ReferenceFrame<'_>) -> Result<f64, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_tuple(position)?,
+        });
+        arguments.push(schema::Argument {
+            position: 2,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
-    pub async fn longitude_at_position(&'a self) -> Result<f64, error::Error> {
+    pub async fn longitude_at_position(&'a self, position: (/*tuple*/), reference_frame: &ReferenceFrame<'_>) -> Result<f64, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_tuple(position)?,
+        });
+        arguments.push(schema::Argument {
+            position: 2,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
-    pub async fn altitude_at_position(&'a self) -> Result<f64, error::Error> {
+    pub async fn altitude_at_position(&'a self, position: (/*tuple*/), reference_frame: &ReferenceFrame<'_>) -> Result<f64, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_tuple(position)?,
+        });
+        arguments.push(schema::Argument {
+            position: 2,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
-    pub async fn atmospheric_density_at_position(&'a self) -> Result<f64, error::Error> {
+    pub async fn atmospheric_density_at_position(&'a self, position: (/*tuple*/), reference_frame: &ReferenceFrame<'_>) -> Result<f64, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_tuple(position)?,
+        });
+        arguments.push(schema::Argument {
+            position: 2,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
-    pub async fn temperature_at(&'a self) -> Result<f64, error::Error> {
+    pub async fn temperature_at(&'a self, position: (/*tuple*/), reference_frame: &ReferenceFrame<'_>) -> Result<f64, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_tuple(position)?,
+        });
+        arguments.push(schema::Argument {
+            position: 2,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
-    pub async fn density_at(&'a self) -> Result<f64, error::Error> {
+    pub async fn density_at(&'a self, altitude: f64) -> Result<f64, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_double(altitude)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
-    pub async fn pressure_at(&'a self) -> Result<f64, error::Error> {
+    pub async fn pressure_at(&'a self, altitude: f64) -> Result<f64, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_double(altitude)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
-    pub async fn biome_at(&'a self) -> Result<String, error::Error> {
+    pub async fn biome_at(&'a self, latitude: f64, longitude: f64) -> Result<String, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_double(latitude)?,
+        });
+        arguments.push(schema::Argument {
+            position: 2,
+            value: encoder::encode_double(longitude)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_string(result)?;
         Ok(return_value)
     }
 
-    pub async fn position(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn position(&'a self, reference_frame: &ReferenceFrame<'_>) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
-    pub async fn velocity(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn velocity(&'a self, reference_frame: &ReferenceFrame<'_>) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
-    pub async fn rotation(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn rotation(&'a self, reference_frame: &ReferenceFrame<'_>) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
-    pub async fn direction(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn direction(&'a self, reference_frame: &ReferenceFrame<'_>) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
-    pub async fn angular_velocity(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn angular_velocity(&'a self, reference_frame: &ReferenceFrame<'_>) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
@@ -1992,6 +2412,10 @@ impl<'a> Contract<'a> {
     // methods
     pub async fn cancel(&'a self) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
@@ -1999,6 +2423,10 @@ impl<'a> Contract<'a> {
 
     pub async fn accept(&'a self) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
@@ -2006,6 +2434,10 @@ impl<'a> Contract<'a> {
 
     pub async fn decline(&'a self) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
@@ -2473,34 +2905,86 @@ impl<'a> Control<'a> {
     // methods
     pub async fn activate_next_stage(&'a self) -> Result<(/*list*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_list(result)?;
         Ok(return_value)
     }
 
-    pub async fn get_action_group(&'a self) -> Result<bool, error::Error> {
+    pub async fn get_action_group(&'a self, group: u32) -> Result<bool, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_uint32(group)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_bool(result)?;
         Ok(return_value)
     }
 
-    pub async fn set_action_group(&'a self) -> Result<(), error::Error> {
+    pub async fn set_action_group(&'a self, group: u32, state: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_uint32(group)?,
+        });
+        arguments.push(schema::Argument {
+            position: 2,
+            value: encoder::encode_bool(state)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
-    pub async fn toggle_action_group(&'a self) -> Result<(), error::Error> {
+    pub async fn toggle_action_group(&'a self, group: u32) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_uint32(group)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
-    pub async fn add_node(&'a self) -> Result<Node<'a>, error::Error> {
+    pub async fn add_node(&'a self, ut: f64, prograde: f32, normal: f32, radial: f32) -> Result<Node<'a>, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_double(ut)?,
+        });
+        arguments.push(schema::Argument {
+            position: 2,
+            value: encoder::encode_float(prograde)?,
+        });
+        arguments.push(schema::Argument {
+            position: 3,
+            value: encoder::encode_float(normal)?,
+        });
+        arguments.push(schema::Argument {
+            position: 4,
+            value: encoder::encode_float(radial)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_class(result)?;
         Ok(Node{id: return_value, conn: &self.conn})
@@ -2508,6 +2992,10 @@ impl<'a> Control<'a> {
 
     pub async fn remove_nodes(&'a self) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
@@ -2547,7 +3035,7 @@ impl<'a> Control<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_sas(&'a self) -> Result<(), error::Error> {
+    pub async fn set_sas(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -2555,7 +3043,7 @@ impl<'a> Control<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "Control_set_SAS", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -2573,7 +3061,7 @@ impl<'a> Control<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_sas_mode(&'a self) -> Result<(), error::Error> {
+    pub async fn set_sas_mode(&'a self, value: (/*enum*/)) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -2581,7 +3069,7 @@ impl<'a> Control<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_enumeration()?,
+            value: encoder::encode_enumeration(value)?,
         });
         let result = self.conn.execute_procedure("", "Control_set_SASMode", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -2599,7 +3087,7 @@ impl<'a> Control<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_speed_mode(&'a self) -> Result<(), error::Error> {
+    pub async fn set_speed_mode(&'a self, value: (/*enum*/)) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -2607,7 +3095,7 @@ impl<'a> Control<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_enumeration()?,
+            value: encoder::encode_enumeration(value)?,
         });
         let result = self.conn.execute_procedure("", "Control_set_SpeedMode", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -2625,7 +3113,7 @@ impl<'a> Control<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_rcs(&'a self) -> Result<(), error::Error> {
+    pub async fn set_rcs(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -2633,7 +3121,7 @@ impl<'a> Control<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "Control_set_RCS", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -2651,7 +3139,7 @@ impl<'a> Control<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_reaction_wheels(&'a self) -> Result<(), error::Error> {
+    pub async fn set_reaction_wheels(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -2659,7 +3147,7 @@ impl<'a> Control<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "Control_set_ReactionWheels", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -2677,7 +3165,7 @@ impl<'a> Control<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_gear(&'a self) -> Result<(), error::Error> {
+    pub async fn set_gear(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -2685,7 +3173,7 @@ impl<'a> Control<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "Control_set_Gear", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -2703,7 +3191,7 @@ impl<'a> Control<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_legs(&'a self) -> Result<(), error::Error> {
+    pub async fn set_legs(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -2711,7 +3199,7 @@ impl<'a> Control<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "Control_set_Legs", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -2729,7 +3217,7 @@ impl<'a> Control<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_wheels(&'a self) -> Result<(), error::Error> {
+    pub async fn set_wheels(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -2737,7 +3225,7 @@ impl<'a> Control<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "Control_set_Wheels", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -2755,7 +3243,7 @@ impl<'a> Control<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_lights(&'a self) -> Result<(), error::Error> {
+    pub async fn set_lights(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -2763,7 +3251,7 @@ impl<'a> Control<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "Control_set_Lights", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -2781,7 +3269,7 @@ impl<'a> Control<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_brakes(&'a self) -> Result<(), error::Error> {
+    pub async fn set_brakes(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -2789,7 +3277,7 @@ impl<'a> Control<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "Control_set_Brakes", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -2807,7 +3295,7 @@ impl<'a> Control<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_antennas(&'a self) -> Result<(), error::Error> {
+    pub async fn set_antennas(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -2815,7 +3303,7 @@ impl<'a> Control<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "Control_set_Antennas", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -2833,7 +3321,7 @@ impl<'a> Control<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_cargo_bays(&'a self) -> Result<(), error::Error> {
+    pub async fn set_cargo_bays(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -2841,7 +3329,7 @@ impl<'a> Control<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "Control_set_CargoBays", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -2859,7 +3347,7 @@ impl<'a> Control<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_intakes(&'a self) -> Result<(), error::Error> {
+    pub async fn set_intakes(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -2867,7 +3355,7 @@ impl<'a> Control<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "Control_set_Intakes", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -2885,7 +3373,7 @@ impl<'a> Control<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_parachutes(&'a self) -> Result<(), error::Error> {
+    pub async fn set_parachutes(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -2893,7 +3381,7 @@ impl<'a> Control<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "Control_set_Parachutes", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -2911,7 +3399,7 @@ impl<'a> Control<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_radiators(&'a self) -> Result<(), error::Error> {
+    pub async fn set_radiators(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -2919,7 +3407,7 @@ impl<'a> Control<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "Control_set_Radiators", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -2937,7 +3425,7 @@ impl<'a> Control<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_resource_harvesters(&'a self) -> Result<(), error::Error> {
+    pub async fn set_resource_harvesters(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -2945,7 +3433,7 @@ impl<'a> Control<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "Control_set_ResourceHarvesters", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -2963,7 +3451,7 @@ impl<'a> Control<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_resource_harvesters_active(&'a self) -> Result<(), error::Error> {
+    pub async fn set_resource_harvesters_active(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -2971,7 +3459,7 @@ impl<'a> Control<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "Control_set_ResourceHarvestersActive", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -2989,7 +3477,7 @@ impl<'a> Control<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_solar_panels(&'a self) -> Result<(), error::Error> {
+    pub async fn set_solar_panels(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -2997,7 +3485,7 @@ impl<'a> Control<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "Control_set_SolarPanels", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -3015,7 +3503,7 @@ impl<'a> Control<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_abort(&'a self) -> Result<(), error::Error> {
+    pub async fn set_abort(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -3023,7 +3511,7 @@ impl<'a> Control<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "Control_set_Abort", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -3041,7 +3529,7 @@ impl<'a> Control<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_throttle(&'a self) -> Result<(), error::Error> {
+    pub async fn set_throttle(&'a self, value: f32) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -3049,7 +3537,7 @@ impl<'a> Control<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_float(0.0)?,
+            value: encoder::encode_float(value)?,
         });
         let result = self.conn.execute_procedure("", "Control_set_Throttle", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -3067,7 +3555,7 @@ impl<'a> Control<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_input_mode(&'a self) -> Result<(), error::Error> {
+    pub async fn set_input_mode(&'a self, value: (/*enum*/)) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -3075,7 +3563,7 @@ impl<'a> Control<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_enumeration()?,
+            value: encoder::encode_enumeration(value)?,
         });
         let result = self.conn.execute_procedure("", "Control_set_InputMode", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -3093,7 +3581,7 @@ impl<'a> Control<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_pitch(&'a self) -> Result<(), error::Error> {
+    pub async fn set_pitch(&'a self, value: f32) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -3101,7 +3589,7 @@ impl<'a> Control<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_float(0.0)?,
+            value: encoder::encode_float(value)?,
         });
         let result = self.conn.execute_procedure("", "Control_set_Pitch", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -3119,7 +3607,7 @@ impl<'a> Control<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_yaw(&'a self) -> Result<(), error::Error> {
+    pub async fn set_yaw(&'a self, value: f32) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -3127,7 +3615,7 @@ impl<'a> Control<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_float(0.0)?,
+            value: encoder::encode_float(value)?,
         });
         let result = self.conn.execute_procedure("", "Control_set_Yaw", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -3145,7 +3633,7 @@ impl<'a> Control<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_roll(&'a self) -> Result<(), error::Error> {
+    pub async fn set_roll(&'a self, value: f32) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -3153,7 +3641,7 @@ impl<'a> Control<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_float(0.0)?,
+            value: encoder::encode_float(value)?,
         });
         let result = self.conn.execute_procedure("", "Control_set_Roll", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -3171,7 +3659,7 @@ impl<'a> Control<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_forward(&'a self) -> Result<(), error::Error> {
+    pub async fn set_forward(&'a self, value: f32) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -3179,7 +3667,7 @@ impl<'a> Control<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_float(0.0)?,
+            value: encoder::encode_float(value)?,
         });
         let result = self.conn.execute_procedure("", "Control_set_Forward", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -3197,7 +3685,7 @@ impl<'a> Control<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_up(&'a self) -> Result<(), error::Error> {
+    pub async fn set_up(&'a self, value: f32) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -3205,7 +3693,7 @@ impl<'a> Control<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_float(0.0)?,
+            value: encoder::encode_float(value)?,
         });
         let result = self.conn.execute_procedure("", "Control_set_Up", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -3223,7 +3711,7 @@ impl<'a> Control<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_right(&'a self) -> Result<(), error::Error> {
+    pub async fn set_right(&'a self, value: f32) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -3231,7 +3719,7 @@ impl<'a> Control<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_float(0.0)?,
+            value: encoder::encode_float(value)?,
         });
         let result = self.conn.execute_procedure("", "Control_set_Right", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -3249,7 +3737,7 @@ impl<'a> Control<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_wheel_throttle(&'a self) -> Result<(), error::Error> {
+    pub async fn set_wheel_throttle(&'a self, value: f32) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -3257,7 +3745,7 @@ impl<'a> Control<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_float(0.0)?,
+            value: encoder::encode_float(value)?,
         });
         let result = self.conn.execute_procedure("", "Control_set_WheelThrottle", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -3275,7 +3763,7 @@ impl<'a> Control<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_wheel_steering(&'a self) -> Result<(), error::Error> {
+    pub async fn set_wheel_steering(&'a self, value: f32) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -3283,7 +3771,7 @@ impl<'a> Control<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_float(0.0)?,
+            value: encoder::encode_float(value)?,
         });
         let result = self.conn.execute_procedure("", "Control_set_WheelSteering", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -3348,7 +3836,7 @@ impl<'a> ControlSurface<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_pitch_enabled(&'a self) -> Result<(), error::Error> {
+    pub async fn set_pitch_enabled(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -3356,7 +3844,7 @@ impl<'a> ControlSurface<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "ControlSurface_set_PitchEnabled", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -3374,7 +3862,7 @@ impl<'a> ControlSurface<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_yaw_enabled(&'a self) -> Result<(), error::Error> {
+    pub async fn set_yaw_enabled(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -3382,7 +3870,7 @@ impl<'a> ControlSurface<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "ControlSurface_set_YawEnabled", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -3400,7 +3888,7 @@ impl<'a> ControlSurface<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_roll_enabled(&'a self) -> Result<(), error::Error> {
+    pub async fn set_roll_enabled(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -3408,7 +3896,7 @@ impl<'a> ControlSurface<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "ControlSurface_set_RollEnabled", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -3426,7 +3914,7 @@ impl<'a> ControlSurface<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_authority_limiter(&'a self) -> Result<(), error::Error> {
+    pub async fn set_authority_limiter(&'a self, value: f32) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -3434,7 +3922,7 @@ impl<'a> ControlSurface<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_float(0.0)?,
+            value: encoder::encode_float(value)?,
         });
         let result = self.conn.execute_procedure("", "ControlSurface_set_AuthorityLimiter", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -3452,7 +3940,7 @@ impl<'a> ControlSurface<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_inverted(&'a self) -> Result<(), error::Error> {
+    pub async fn set_inverted(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -3460,7 +3948,7 @@ impl<'a> ControlSurface<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "ControlSurface_set_Inverted", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -3478,7 +3966,7 @@ impl<'a> ControlSurface<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_deployed(&'a self) -> Result<(), error::Error> {
+    pub async fn set_deployed(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -3486,7 +3974,7 @@ impl<'a> ControlSurface<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "ControlSurface_set_Deployed", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -3540,7 +4028,7 @@ impl<'a> CrewMember<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_name(&'a self) -> Result<(), error::Error> {
+    pub async fn set_name(&'a self, value: String) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -3548,7 +4036,7 @@ impl<'a> CrewMember<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_string()?,
+            value: encoder::encode_string(value)?,
         });
         let result = self.conn.execute_procedure("", "CrewMember_set_Name", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -3588,7 +4076,7 @@ impl<'a> CrewMember<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_courage(&'a self) -> Result<(), error::Error> {
+    pub async fn set_courage(&'a self, value: f32) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -3596,7 +4084,7 @@ impl<'a> CrewMember<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_float(0.0)?,
+            value: encoder::encode_float(value)?,
         });
         let result = self.conn.execute_procedure("", "CrewMember_set_Courage", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -3614,7 +4102,7 @@ impl<'a> CrewMember<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_stupidity(&'a self) -> Result<(), error::Error> {
+    pub async fn set_stupidity(&'a self, value: f32) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -3622,7 +4110,7 @@ impl<'a> CrewMember<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_float(0.0)?,
+            value: encoder::encode_float(value)?,
         });
         let result = self.conn.execute_procedure("", "CrewMember_set_Stupidity", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -3640,7 +4128,7 @@ impl<'a> CrewMember<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_experience(&'a self) -> Result<(), error::Error> {
+    pub async fn set_experience(&'a self, value: f32) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -3648,7 +4136,7 @@ impl<'a> CrewMember<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_float(0.0)?,
+            value: encoder::encode_float(value)?,
         });
         let result = self.conn.execute_procedure("", "CrewMember_set_Experience", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -3666,7 +4154,7 @@ impl<'a> CrewMember<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_badass(&'a self) -> Result<(), error::Error> {
+    pub async fn set_badass(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -3674,7 +4162,7 @@ impl<'a> CrewMember<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "CrewMember_set_Badass", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -3692,7 +4180,7 @@ impl<'a> CrewMember<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_veteran(&'a self) -> Result<(), error::Error> {
+    pub async fn set_veteran(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -3700,7 +4188,7 @@ impl<'a> CrewMember<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "CrewMember_set_Veteran", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -3722,6 +4210,10 @@ impl<'a> Decoupler<'a> {
     // methods
     pub async fn decouple(&'a self) -> Result<Vessel<'a>, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_class(result)?;
         Ok(Vessel{id: return_value, conn: &self.conn})
@@ -3787,27 +4279,55 @@ impl<'a> DockingPort<'a> {
     // methods
     pub async fn undock(&'a self) -> Result<Vessel<'a>, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_class(result)?;
         Ok(Vessel{id: return_value, conn: &self.conn})
     }
 
-    pub async fn position(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn position(&'a self, reference_frame: &ReferenceFrame<'_>) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
-    pub async fn direction(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn direction(&'a self, reference_frame: &ReferenceFrame<'_>) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
-    pub async fn rotation(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn rotation(&'a self, reference_frame: &ReferenceFrame<'_>) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
@@ -3880,7 +4400,7 @@ impl<'a> DockingPort<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_shielded(&'a self) -> Result<(), error::Error> {
+    pub async fn set_shielded(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -3888,7 +4408,7 @@ impl<'a> DockingPort<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "DockingPort_set_Shielded", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -3921,6 +4441,10 @@ impl<'a> Engine<'a> {
     // methods
     pub async fn toggle_mode(&'a self) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
@@ -3949,7 +4473,7 @@ impl<'a> Engine<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_active(&'a self) -> Result<(), error::Error> {
+    pub async fn set_active(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -3957,7 +4481,7 @@ impl<'a> Engine<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "Engine_set_Active", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -4019,7 +4543,7 @@ impl<'a> Engine<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_thrust_limit(&'a self) -> Result<(), error::Error> {
+    pub async fn set_thrust_limit(&'a self, value: f32) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -4027,7 +4551,7 @@ impl<'a> Engine<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_float(0.0)?,
+            value: encoder::encode_float(value)?,
         });
         let result = self.conn.execute_procedure("", "Engine_set_ThrustLimit", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -4188,7 +4712,7 @@ impl<'a> Engine<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_mode(&'a self) -> Result<(), error::Error> {
+    pub async fn set_mode(&'a self, value: String) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -4196,7 +4720,7 @@ impl<'a> Engine<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_string()?,
+            value: encoder::encode_string(value)?,
         });
         let result = self.conn.execute_procedure("", "Engine_set_Mode", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -4225,7 +4749,7 @@ impl<'a> Engine<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_auto_mode_switch(&'a self) -> Result<(), error::Error> {
+    pub async fn set_auto_mode_switch(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -4233,7 +4757,7 @@ impl<'a> Engine<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "Engine_set_AutoModeSwitch", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -4273,7 +4797,7 @@ impl<'a> Engine<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_gimbal_locked(&'a self) -> Result<(), error::Error> {
+    pub async fn set_gimbal_locked(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -4281,7 +4805,7 @@ impl<'a> Engine<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "Engine_set_GimbalLocked", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -4299,7 +4823,7 @@ impl<'a> Engine<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_gimbal_limit(&'a self) -> Result<(), error::Error> {
+    pub async fn set_gimbal_limit(&'a self, value: f32) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -4307,7 +4831,7 @@ impl<'a> Engine<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_float(0.0)?,
+            value: encoder::encode_float(value)?,
         });
         let result = self.conn.execute_procedure("", "Engine_set_GimbalLimit", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -4340,6 +4864,10 @@ impl<'a> Experiment<'a> {
     // methods
     pub async fn run(&'a self) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
@@ -4347,6 +4875,10 @@ impl<'a> Experiment<'a> {
 
     pub async fn transmit(&'a self) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
@@ -4354,6 +4886,10 @@ impl<'a> Experiment<'a> {
 
     pub async fn dump(&'a self) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
@@ -4361,6 +4897,10 @@ impl<'a> Experiment<'a> {
 
     pub async fn reset(&'a self) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
@@ -4481,6 +5021,10 @@ impl<'a> Fairing<'a> {
     // methods
     pub async fn jettison(&'a self) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
@@ -4522,8 +5066,24 @@ pub struct Flight<'a> {
 }
 impl<'a> Flight<'a> {
     // methods
-    pub async fn simulate_aerodynamic_force_at(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn simulate_aerodynamic_force_at(&'a self, body: &CelestialBody<'_>, position: (/*tuple*/), velocity: (/*tuple*/)) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(body.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 2,
+            value: encoder::encode_tuple(position)?,
+        });
+        arguments.push(schema::Argument {
+            position: 3,
+            value: encoder::encode_tuple(velocity)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
@@ -5040,6 +5600,10 @@ impl<'a> Force<'a> {
     // methods
     pub async fn remove(&'a self) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
@@ -5068,7 +5632,7 @@ impl<'a> Force<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_force_vector(&'a self) -> Result<(), error::Error> {
+    pub async fn set_force_vector(&'a self, value: (/*tuple*/)) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -5076,7 +5640,7 @@ impl<'a> Force<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_tuple()?,
+            value: encoder::encode_tuple(value)?,
         });
         let result = self.conn.execute_procedure("", "Force_set_ForceVector", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -5094,7 +5658,7 @@ impl<'a> Force<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_position(&'a self) -> Result<(), error::Error> {
+    pub async fn set_position(&'a self, value: (/*tuple*/)) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -5102,7 +5666,7 @@ impl<'a> Force<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_tuple()?,
+            value: encoder::encode_tuple(value)?,
         });
         let result = self.conn.execute_procedure("", "Force_set_Position", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -5120,7 +5684,7 @@ impl<'a> Force<'a> {
         Ok(ReferenceFrame{id: return_value, conn: &self.conn})
     }
 
-    pub async fn set_reference_frame(&'a self) -> Result<(), error::Error> {
+    pub async fn set_reference_frame(&'a self, value: &ReferenceFrame<'_>) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -5128,7 +5692,7 @@ impl<'a> Force<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_u64(0)?,
+            value: encoder::encode_u64(value.id)?,
         });
         let result = self.conn.execute_procedure("", "Force_set_ReferenceFrame", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -5171,7 +5735,7 @@ impl<'a> Intake<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_open(&'a self) -> Result<(), error::Error> {
+    pub async fn set_open(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -5179,7 +5743,7 @@ impl<'a> Intake<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "Intake_set_Open", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -5234,6 +5798,10 @@ impl<'a> LaunchClamp<'a> {
     // methods
     pub async fn release(&'a self) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
@@ -5309,7 +5877,7 @@ impl<'a> Leg<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_deployed(&'a self) -> Result<(), error::Error> {
+    pub async fn set_deployed(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -5317,7 +5885,7 @@ impl<'a> Leg<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "Leg_set_Deployed", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -5371,7 +5939,7 @@ impl<'a> Light<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_active(&'a self) -> Result<(), error::Error> {
+    pub async fn set_active(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -5379,7 +5947,7 @@ impl<'a> Light<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "Light_set_Active", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -5397,7 +5965,7 @@ impl<'a> Light<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_color(&'a self) -> Result<(), error::Error> {
+    pub async fn set_color(&'a self, value: (/*tuple*/)) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -5405,7 +5973,7 @@ impl<'a> Light<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_tuple()?,
+            value: encoder::encode_tuple(value)?,
         });
         let result = self.conn.execute_procedure("", "Light_set_Color", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -5436,71 +6004,167 @@ pub struct Module<'a> {
 }
 impl<'a> Module<'a> {
     // methods
-    pub async fn has_field(&'a self) -> Result<bool, error::Error> {
+    pub async fn has_field(&'a self, name: String) -> Result<bool, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_string(name)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_bool(result)?;
         Ok(return_value)
     }
 
-    pub async fn get_field(&'a self) -> Result<String, error::Error> {
+    pub async fn get_field(&'a self, name: String) -> Result<String, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_string(name)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_string(result)?;
         Ok(return_value)
     }
 
-    pub async fn set_field_int(&'a self) -> Result<(), error::Error> {
+    pub async fn set_field_int(&'a self, name: String, value: i32) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_string(name)?,
+        });
+        arguments.push(schema::Argument {
+            position: 2,
+            value: encoder::encode_sint32(value)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
-    pub async fn set_field_float(&'a self) -> Result<(), error::Error> {
+    pub async fn set_field_float(&'a self, name: String, value: f32) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_string(name)?,
+        });
+        arguments.push(schema::Argument {
+            position: 2,
+            value: encoder::encode_float(value)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
-    pub async fn set_field_string(&'a self) -> Result<(), error::Error> {
+    pub async fn set_field_string(&'a self, name: String, value: String) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_string(name)?,
+        });
+        arguments.push(schema::Argument {
+            position: 2,
+            value: encoder::encode_string(value)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
-    pub async fn reset_field(&'a self) -> Result<(), error::Error> {
+    pub async fn reset_field(&'a self, name: String) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_string(name)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
-    pub async fn has_event(&'a self) -> Result<bool, error::Error> {
+    pub async fn has_event(&'a self, name: String) -> Result<bool, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_string(name)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_bool(result)?;
         Ok(return_value)
     }
 
-    pub async fn trigger_event(&'a self) -> Result<(), error::Error> {
+    pub async fn trigger_event(&'a self, name: String) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_string(name)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
-    pub async fn has_action(&'a self) -> Result<bool, error::Error> {
+    pub async fn has_action(&'a self, name: String) -> Result<bool, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_string(name)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_bool(result)?;
         Ok(return_value)
     }
 
-    pub async fn set_action(&'a self) -> Result<(), error::Error> {
+    pub async fn set_action(&'a self, name: String, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_string(name)?,
+        });
+        arguments.push(schema::Argument {
+            position: 2,
+            value: encoder::encode_bool(value)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
@@ -5575,15 +6239,31 @@ pub struct Node<'a> {
 }
 impl<'a> Node<'a> {
     // methods
-    pub async fn burn_vector(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn burn_vector(&'a self, reference_frame: &ReferenceFrame<'_>) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
-    pub async fn remaining_burn_vector(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn remaining_burn_vector(&'a self, reference_frame: &ReferenceFrame<'_>) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
@@ -5591,20 +6271,40 @@ impl<'a> Node<'a> {
 
     pub async fn remove(&'a self) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
-    pub async fn position(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn position(&'a self, reference_frame: &ReferenceFrame<'_>) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
-    pub async fn direction(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn direction(&'a self, reference_frame: &ReferenceFrame<'_>) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
@@ -5622,7 +6322,7 @@ impl<'a> Node<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_prograde(&'a self) -> Result<(), error::Error> {
+    pub async fn set_prograde(&'a self, value: f64) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -5630,7 +6330,7 @@ impl<'a> Node<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_double(0.0)?,
+            value: encoder::encode_double(value)?,
         });
         let result = self.conn.execute_procedure("", "Node_set_Prograde", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -5648,7 +6348,7 @@ impl<'a> Node<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_normal(&'a self) -> Result<(), error::Error> {
+    pub async fn set_normal(&'a self, value: f64) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -5656,7 +6356,7 @@ impl<'a> Node<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_double(0.0)?,
+            value: encoder::encode_double(value)?,
         });
         let result = self.conn.execute_procedure("", "Node_set_Normal", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -5674,7 +6374,7 @@ impl<'a> Node<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_radial(&'a self) -> Result<(), error::Error> {
+    pub async fn set_radial(&'a self, value: f64) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -5682,7 +6382,7 @@ impl<'a> Node<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_double(0.0)?,
+            value: encoder::encode_double(value)?,
         });
         let result = self.conn.execute_procedure("", "Node_set_Radial", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -5700,7 +6400,7 @@ impl<'a> Node<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_delta_v(&'a self) -> Result<(), error::Error> {
+    pub async fn set_delta_v(&'a self, value: f64) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -5708,7 +6408,7 @@ impl<'a> Node<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_double(0.0)?,
+            value: encoder::encode_double(value)?,
         });
         let result = self.conn.execute_procedure("", "Node_set_DeltaV", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -5737,7 +6437,7 @@ impl<'a> Node<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_ut(&'a self) -> Result<(), error::Error> {
+    pub async fn set_ut(&'a self, value: f64) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -5745,7 +6445,7 @@ impl<'a> Node<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_double(0.0)?,
+            value: encoder::encode_double(value)?,
         });
         let result = self.conn.execute_procedure("", "Node_set_UT", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -5809,120 +6509,256 @@ pub struct Orbit<'a> {
 }
 impl<'a> Orbit<'a> {
     // methods
-    pub async fn reference_plane_normal(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn reference_plane_normal(&'a self, reference_frame: &ReferenceFrame<'_>) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
-    pub async fn reference_plane_direction(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn reference_plane_direction(&'a self, reference_frame: &ReferenceFrame<'_>) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
-    pub async fn mean_anomaly_at_ut(&'a self) -> Result<f64, error::Error> {
+    pub async fn mean_anomaly_at_ut(&'a self, ut: f64) -> Result<f64, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_double(ut)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
-    pub async fn radius_at_true_anomaly(&'a self) -> Result<f64, error::Error> {
+    pub async fn radius_at_true_anomaly(&'a self, true_anomaly: f64) -> Result<f64, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_double(true_anomaly)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
-    pub async fn true_anomaly_at_radius(&'a self) -> Result<f64, error::Error> {
+    pub async fn true_anomaly_at_radius(&'a self, radius: f64) -> Result<f64, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_double(radius)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
-    pub async fn true_anomaly_at_ut(&'a self) -> Result<f64, error::Error> {
+    pub async fn true_anomaly_at_ut(&'a self, ut: f64) -> Result<f64, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_double(ut)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
-    pub async fn ut_at_true_anomaly(&'a self) -> Result<f64, error::Error> {
+    pub async fn ut_at_true_anomaly(&'a self, true_anomaly: f64) -> Result<f64, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_double(true_anomaly)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
-    pub async fn eccentric_anomaly_at_ut(&'a self) -> Result<f64, error::Error> {
+    pub async fn eccentric_anomaly_at_ut(&'a self, ut: f64) -> Result<f64, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_double(ut)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
-    pub async fn orbital_speed_at(&'a self) -> Result<f64, error::Error> {
+    pub async fn orbital_speed_at(&'a self, time: f64) -> Result<f64, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_double(time)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
-    pub async fn radius_at(&'a self) -> Result<f64, error::Error> {
+    pub async fn radius_at(&'a self, ut: f64) -> Result<f64, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_double(ut)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
-    pub async fn position_at(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn position_at(&'a self, ut: f64, reference_frame: &ReferenceFrame<'_>) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_double(ut)?,
+        });
+        arguments.push(schema::Argument {
+            position: 2,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
-    pub async fn time_of_closest_approach(&'a self) -> Result<f64, error::Error> {
+    pub async fn time_of_closest_approach(&'a self, target: &Orbit<'_>) -> Result<f64, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(target.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
-    pub async fn distance_at_closest_approach(&'a self) -> Result<f64, error::Error> {
+    pub async fn distance_at_closest_approach(&'a self, target: &Orbit<'_>) -> Result<f64, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(target.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
-    pub async fn list_closest_approaches(&'a self) -> Result<(/*list*/), error::Error> {
+    pub async fn list_closest_approaches(&'a self, target: &Orbit<'_>, orbits: i32) -> Result<(/*list*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(target.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 2,
+            value: encoder::encode_sint32(orbits)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_list(result)?;
         Ok(return_value)
     }
 
-    pub async fn true_anomaly_at_an(&'a self) -> Result<f64, error::Error> {
+    pub async fn true_anomaly_at_an(&'a self, target: &Orbit<'_>) -> Result<f64, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(target.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
-    pub async fn true_anomaly_at_dn(&'a self) -> Result<f64, error::Error> {
+    pub async fn true_anomaly_at_dn(&'a self, target: &Orbit<'_>) -> Result<f64, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(target.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
     }
 
-    pub async fn relative_inclination(&'a self) -> Result<f64, error::Error> {
+    pub async fn relative_inclination(&'a self, target: &Orbit<'_>) -> Result<f64, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(target.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_double(result)?;
         Ok(return_value)
@@ -6208,6 +7044,10 @@ impl<'a> Parachute<'a> {
     // methods
     pub async fn deploy(&'a self) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
@@ -6215,6 +7055,10 @@ impl<'a> Parachute<'a> {
 
     pub async fn arm(&'a self) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
@@ -6276,7 +7120,7 @@ impl<'a> Parachute<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_deploy_altitude(&'a self) -> Result<(), error::Error> {
+    pub async fn set_deploy_altitude(&'a self, value: f32) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -6284,7 +7128,7 @@ impl<'a> Parachute<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_float(0.0)?,
+            value: encoder::encode_float(value)?,
         });
         let result = self.conn.execute_procedure("", "Parachute_set_DeployAltitude", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -6302,7 +7146,7 @@ impl<'a> Parachute<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_deploy_min_pressure(&'a self) -> Result<(), error::Error> {
+    pub async fn set_deploy_min_pressure(&'a self, value: f32) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -6310,7 +7154,7 @@ impl<'a> Parachute<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_float(0.0)?,
+            value: encoder::encode_float(value)?,
         });
         let result = self.conn.execute_procedure("", "Parachute_set_DeployMinPressure", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -6330,57 +7174,137 @@ pub struct Part<'a> {
 }
 impl<'a> Part<'a> {
     // methods
-    pub async fn position(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn position(&'a self, reference_frame: &ReferenceFrame<'_>) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
-    pub async fn center_of_mass(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn center_of_mass(&'a self, reference_frame: &ReferenceFrame<'_>) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
-    pub async fn bounding_box(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn bounding_box(&'a self, reference_frame: &ReferenceFrame<'_>) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
-    pub async fn direction(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn direction(&'a self, reference_frame: &ReferenceFrame<'_>) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
-    pub async fn velocity(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn velocity(&'a self, reference_frame: &ReferenceFrame<'_>) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
-    pub async fn rotation(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn rotation(&'a self, reference_frame: &ReferenceFrame<'_>) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
-    pub async fn add_force(&'a self) -> Result<Force<'a>, error::Error> {
+    pub async fn add_force(&'a self, force: (/*tuple*/), position: (/*tuple*/), reference_frame: &ReferenceFrame<'_>) -> Result<Force<'a>, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_tuple(force)?,
+        });
+        arguments.push(schema::Argument {
+            position: 2,
+            value: encoder::encode_tuple(position)?,
+        });
+        arguments.push(schema::Argument {
+            position: 3,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_class(result)?;
         Ok(Force{id: return_value, conn: &self.conn})
     }
 
-    pub async fn instantaneous_force(&'a self) -> Result<(), error::Error> {
+    pub async fn instantaneous_force(&'a self, force: (/*tuple*/), position: (/*tuple*/), reference_frame: &ReferenceFrame<'_>) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_tuple(force)?,
+        });
+        arguments.push(schema::Argument {
+            position: 2,
+            value: encoder::encode_tuple(position)?,
+        });
+        arguments.push(schema::Argument {
+            position: 3,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
@@ -6420,7 +7344,7 @@ impl<'a> Part<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_tag(&'a self) -> Result<(), error::Error> {
+    pub async fn set_tag(&'a self, value: String) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -6428,7 +7352,7 @@ impl<'a> Part<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_string()?,
+            value: encoder::encode_string(value)?,
         });
         let result = self.conn.execute_procedure("", "Part_set_Tag", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -6446,7 +7370,7 @@ impl<'a> Part<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_highlighted(&'a self) -> Result<(), error::Error> {
+    pub async fn set_highlighted(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -6454,7 +7378,7 @@ impl<'a> Part<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "Part_set_Highlighted", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -6472,7 +7396,7 @@ impl<'a> Part<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_highlight_color(&'a self) -> Result<(), error::Error> {
+    pub async fn set_highlight_color(&'a self, value: (/*tuple*/)) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -6480,7 +7404,7 @@ impl<'a> Part<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_tuple()?,
+            value: encoder::encode_tuple(value)?,
         });
         let result = self.conn.execute_procedure("", "Part_set_HighlightColor", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -7127,50 +8051,106 @@ pub struct Parts<'a> {
 }
 impl<'a> Parts<'a> {
     // methods
-    pub async fn with_name(&'a self) -> Result<(/*list*/), error::Error> {
+    pub async fn with_name(&'a self, name: String) -> Result<(/*list*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_string(name)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_list(result)?;
         Ok(return_value)
     }
 
-    pub async fn with_title(&'a self) -> Result<(/*list*/), error::Error> {
+    pub async fn with_title(&'a self, title: String) -> Result<(/*list*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_string(title)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_list(result)?;
         Ok(return_value)
     }
 
-    pub async fn with_tag(&'a self) -> Result<(/*list*/), error::Error> {
+    pub async fn with_tag(&'a self, tag: String) -> Result<(/*list*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_string(tag)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_list(result)?;
         Ok(return_value)
     }
 
-    pub async fn with_module(&'a self) -> Result<(/*list*/), error::Error> {
+    pub async fn with_module(&'a self, module_name: String) -> Result<(/*list*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_string(module_name)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_list(result)?;
         Ok(return_value)
     }
 
-    pub async fn in_stage(&'a self) -> Result<(/*list*/), error::Error> {
+    pub async fn in_stage(&'a self, stage: i32) -> Result<(/*list*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_sint32(stage)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_list(result)?;
         Ok(return_value)
     }
 
-    pub async fn in_decouple_stage(&'a self) -> Result<(/*list*/), error::Error> {
+    pub async fn in_decouple_stage(&'a self, stage: i32) -> Result<(/*list*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_sint32(stage)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_list(result)?;
         Ok(return_value)
     }
 
-    pub async fn modules_with_name(&'a self) -> Result<(/*list*/), error::Error> {
+    pub async fn modules_with_name(&'a self, module_name: String) -> Result<(/*list*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_string(module_name)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_list(result)?;
         Ok(return_value)
@@ -7210,7 +8190,7 @@ impl<'a> Parts<'a> {
         Ok(Part{id: return_value, conn: &self.conn})
     }
 
-    pub async fn set_controlling(&'a self) -> Result<(), error::Error> {
+    pub async fn set_controlling(&'a self, value: &Part<'_>) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -7218,7 +8198,7 @@ impl<'a> Parts<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_u64(0)?,
+            value: encoder::encode_u64(value.id)?,
         });
         let result = self.conn.execute_procedure("", "Parts_set_Controlling", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -7627,7 +8607,7 @@ impl<'a> RCS<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_enabled(&'a self) -> Result<(), error::Error> {
+    pub async fn set_enabled(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -7635,7 +8615,7 @@ impl<'a> RCS<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "RCS_set_Enabled", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -7653,7 +8633,7 @@ impl<'a> RCS<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_pitch_enabled(&'a self) -> Result<(), error::Error> {
+    pub async fn set_pitch_enabled(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -7661,7 +8641,7 @@ impl<'a> RCS<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "RCS_set_PitchEnabled", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -7679,7 +8659,7 @@ impl<'a> RCS<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_yaw_enabled(&'a self) -> Result<(), error::Error> {
+    pub async fn set_yaw_enabled(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -7687,7 +8667,7 @@ impl<'a> RCS<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "RCS_set_YawEnabled", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -7705,7 +8685,7 @@ impl<'a> RCS<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_roll_enabled(&'a self) -> Result<(), error::Error> {
+    pub async fn set_roll_enabled(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -7713,7 +8693,7 @@ impl<'a> RCS<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "RCS_set_RollEnabled", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -7731,7 +8711,7 @@ impl<'a> RCS<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_forward_enabled(&'a self) -> Result<(), error::Error> {
+    pub async fn set_forward_enabled(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -7739,7 +8719,7 @@ impl<'a> RCS<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "RCS_set_ForwardEnabled", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -7757,7 +8737,7 @@ impl<'a> RCS<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_up_enabled(&'a self) -> Result<(), error::Error> {
+    pub async fn set_up_enabled(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -7765,7 +8745,7 @@ impl<'a> RCS<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "RCS_set_UpEnabled", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -7783,7 +8763,7 @@ impl<'a> RCS<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_right_enabled(&'a self) -> Result<(), error::Error> {
+    pub async fn set_right_enabled(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -7791,7 +8771,7 @@ impl<'a> RCS<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "RCS_set_RightEnabled", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -7955,7 +8935,7 @@ impl<'a> Radiator<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_deployed(&'a self) -> Result<(), error::Error> {
+    pub async fn set_deployed(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -7963,7 +8943,7 @@ impl<'a> Radiator<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "Radiator_set_Deployed", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -8017,7 +8997,7 @@ impl<'a> ReactionWheel<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_active(&'a self) -> Result<(), error::Error> {
+    pub async fn set_active(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -8025,7 +9005,7 @@ impl<'a> ReactionWheel<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "ReactionWheel_set_Active", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -8078,15 +9058,51 @@ pub struct ReferenceFrame<'a> {
 }
 impl<'a> ReferenceFrame<'a> {
     // methods
-    pub async fn create_relative(&'a self) -> Result<ReferenceFrame<'a>, error::Error> {
+    pub async fn create_relative(&'a self, reference_frame: &ReferenceFrame<'_>, position: (/*tuple*/), rotation: (/*tuple*/), velocity: (/*tuple*/), angular_velocity: (/*tuple*/)) -> Result<ReferenceFrame<'a>, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_tuple(position)?,
+        });
+        arguments.push(schema::Argument {
+            position: 2,
+            value: encoder::encode_tuple(rotation)?,
+        });
+        arguments.push(schema::Argument {
+            position: 3,
+            value: encoder::encode_tuple(velocity)?,
+        });
+        arguments.push(schema::Argument {
+            position: 4,
+            value: encoder::encode_tuple(angular_velocity)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_class(result)?;
         Ok(ReferenceFrame{id: return_value, conn: &self.conn})
     }
 
-    pub async fn create_hybrid(&'a self) -> Result<ReferenceFrame<'a>, error::Error> {
+    pub async fn create_hybrid(&'a self, position: &ReferenceFrame<'_>, rotation: &ReferenceFrame<'_>, velocity: &ReferenceFrame<'_>, angular_velocity: &ReferenceFrame<'_>) -> Result<ReferenceFrame<'a>, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(position.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(rotation.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 2,
+            value: encoder::encode_u64(velocity.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 3,
+            value: encoder::encode_u64(angular_velocity.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_class(result)?;
         Ok(ReferenceFrame{id: return_value, conn: &self.conn})
@@ -8184,7 +9200,7 @@ impl<'a> Resource<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_enabled(&'a self) -> Result<(), error::Error> {
+    pub async fn set_enabled(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -8192,7 +9208,7 @@ impl<'a> Resource<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "Resource_set_Enabled", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -8212,57 +9228,121 @@ pub struct ResourceConverter<'a> {
 }
 impl<'a> ResourceConverter<'a> {
     // methods
-    pub async fn active(&'a self) -> Result<bool, error::Error> {
+    pub async fn active(&'a self, index: i32) -> Result<bool, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_sint32(index)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_bool(result)?;
         Ok(return_value)
     }
 
-    pub async fn name(&'a self) -> Result<String, error::Error> {
+    pub async fn name(&'a self, index: i32) -> Result<String, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_sint32(index)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_string(result)?;
         Ok(return_value)
     }
 
-    pub async fn start(&'a self) -> Result<(), error::Error> {
+    pub async fn start(&'a self, index: i32) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_sint32(index)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
-    pub async fn stop(&'a self) -> Result<(), error::Error> {
+    pub async fn stop(&'a self, index: i32) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_sint32(index)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
-    pub async fn state(&'a self) -> Result<(/*enum*/), error::Error> {
+    pub async fn state(&'a self, index: i32) -> Result<(/*enum*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_sint32(index)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_enumeration(result)?;
         Ok(return_value)
     }
 
-    pub async fn status_info(&'a self) -> Result<String, error::Error> {
+    pub async fn status_info(&'a self, index: i32) -> Result<String, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_sint32(index)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_string(result)?;
         Ok(return_value)
     }
 
-    pub async fn inputs(&'a self) -> Result<(/*list*/), error::Error> {
+    pub async fn inputs(&'a self, index: i32) -> Result<(/*list*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_sint32(index)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_list(result)?;
         Ok(return_value)
     }
 
-    pub async fn outputs(&'a self) -> Result<(/*list*/), error::Error> {
+    pub async fn outputs(&'a self, index: i32) -> Result<(/*list*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_sint32(index)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_list(result)?;
         Ok(return_value)
@@ -8371,7 +9451,7 @@ impl<'a> ResourceHarvester<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_deployed(&'a self) -> Result<(), error::Error> {
+    pub async fn set_deployed(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -8379,7 +9459,7 @@ impl<'a> ResourceHarvester<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "ResourceHarvester_set_Deployed", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -8397,7 +9477,7 @@ impl<'a> ResourceHarvester<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_active(&'a self) -> Result<(), error::Error> {
+    pub async fn set_active(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -8405,7 +9485,7 @@ impl<'a> ResourceHarvester<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "ResourceHarvester_set_Active", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -8469,8 +9549,24 @@ pub struct ResourceTransfer<'a> {
 }
 impl<'a> ResourceTransfer<'a> {
     // methods
-    pub async fn start(&'a self) -> Result<ResourceTransfer<'a>, error::Error> {
+    pub async fn start(&'a self, from_part: &Part<'_>, to_part: &Part<'_>, resource: String, max_amount: f32) -> Result<ResourceTransfer<'a>, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(from_part.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(to_part.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 2,
+            value: encoder::encode_string(resource)?,
+        });
+        arguments.push(schema::Argument {
+            position: 3,
+            value: encoder::encode_float(max_amount)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_class(result)?;
         Ok(ResourceTransfer{id: return_value, conn: &self.conn})
@@ -8512,43 +9608,83 @@ pub struct Resources<'a> {
 }
 impl<'a> Resources<'a> {
     // methods
-    pub async fn with_resource(&'a self) -> Result<(/*list*/), error::Error> {
+    pub async fn with_resource(&'a self, name: String) -> Result<(/*list*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_string(name)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_list(result)?;
         Ok(return_value)
     }
 
-    pub async fn has_resource(&'a self) -> Result<bool, error::Error> {
+    pub async fn has_resource(&'a self, name: String) -> Result<bool, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_string(name)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_bool(result)?;
         Ok(return_value)
     }
 
-    pub async fn max(&'a self) -> Result<f32, error::Error> {
+    pub async fn max(&'a self, name: String) -> Result<f32, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_string(name)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_float(result)?;
         Ok(return_value)
     }
 
-    pub async fn amount(&'a self) -> Result<f32, error::Error> {
+    pub async fn amount(&'a self, name: String) -> Result<f32, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_string(name)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_float(result)?;
         Ok(return_value)
     }
 
-    pub async fn density(&'a self) -> Result<f32, error::Error> {
+    pub async fn density(&'a self, name: String) -> Result<f32, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_string(name)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_float(result)?;
         Ok(return_value)
     }
 
-    pub async fn flow_mode(&'a self) -> Result<(/*enum*/), error::Error> {
+    pub async fn flow_mode(&'a self, name: String) -> Result<(/*enum*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_string(name)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_enumeration(result)?;
         Ok(return_value)
@@ -8588,7 +9724,7 @@ impl<'a> Resources<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_enabled(&'a self) -> Result<(), error::Error> {
+    pub async fn set_enabled(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -8596,7 +9732,7 @@ impl<'a> Resources<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "Resources_set_Enabled", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -8777,7 +9913,7 @@ impl<'a> Sensor<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_active(&'a self) -> Result<(), error::Error> {
+    pub async fn set_active(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -8785,7 +9921,7 @@ impl<'a> Sensor<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "Sensor_set_Active", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -8850,7 +9986,7 @@ impl<'a> SolarPanel<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_deployed(&'a self) -> Result<(), error::Error> {
+    pub async fn set_deployed(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -8858,7 +9994,7 @@ impl<'a> SolarPanel<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "SolarPanel_set_Deployed", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -8911,36 +10047,76 @@ pub struct Thruster<'a> {
 }
 impl<'a> Thruster<'a> {
     // methods
-    pub async fn thrust_position(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn thrust_position(&'a self, reference_frame: &ReferenceFrame<'_>) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
-    pub async fn thrust_direction(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn thrust_direction(&'a self, reference_frame: &ReferenceFrame<'_>) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
-    pub async fn initial_thrust_position(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn initial_thrust_position(&'a self, reference_frame: &ReferenceFrame<'_>) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
-    pub async fn initial_thrust_direction(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn initial_thrust_direction(&'a self, reference_frame: &ReferenceFrame<'_>) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
-    pub async fn gimbal_position(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn gimbal_position(&'a self, reference_frame: &ReferenceFrame<'_>) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
@@ -9006,62 +10182,134 @@ impl<'a> Vessel<'a> {
     // methods
     pub async fn recover(&'a self) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
     }
 
-    pub async fn flight(&'a self) -> Result<Flight<'a>, error::Error> {
+    pub async fn flight(&'a self, reference_frame: &ReferenceFrame<'_>) -> Result<Flight<'a>, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_class(result)?;
         Ok(Flight{id: return_value, conn: &self.conn})
     }
 
-    pub async fn resources_in_decouple_stage(&'a self) -> Result<Resources<'a>, error::Error> {
+    pub async fn resources_in_decouple_stage(&'a self, stage: i32, cumulative: bool) -> Result<Resources<'a>, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_sint32(stage)?,
+        });
+        arguments.push(schema::Argument {
+            position: 2,
+            value: encoder::encode_bool(cumulative)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_class(result)?;
         Ok(Resources{id: return_value, conn: &self.conn})
     }
 
-    pub async fn position(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn position(&'a self, reference_frame: &ReferenceFrame<'_>) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
-    pub async fn bounding_box(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn bounding_box(&'a self, reference_frame: &ReferenceFrame<'_>) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
-    pub async fn velocity(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn velocity(&'a self, reference_frame: &ReferenceFrame<'_>) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
-    pub async fn rotation(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn rotation(&'a self, reference_frame: &ReferenceFrame<'_>) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
-    pub async fn direction(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn direction(&'a self, reference_frame: &ReferenceFrame<'_>) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
     }
 
-    pub async fn angular_velocity(&'a self) -> Result<(/*tuple*/), error::Error> {
+    pub async fn angular_velocity(&'a self, reference_frame: &ReferenceFrame<'_>) -> Result<(/*tuple*/), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_u64(reference_frame.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_tuple(result)?;
         Ok(return_value)
@@ -9079,7 +10327,7 @@ impl<'a> Vessel<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_name(&'a self) -> Result<(), error::Error> {
+    pub async fn set_name(&'a self, value: String) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -9087,7 +10335,7 @@ impl<'a> Vessel<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_string()?,
+            value: encoder::encode_string(value)?,
         });
         let result = self.conn.execute_procedure("", "Vessel_set_Name", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -9105,7 +10353,7 @@ impl<'a> Vessel<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_type(&'a self) -> Result<(), error::Error> {
+    pub async fn set_type(&'a self, value: (/*enum*/)) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -9113,7 +10361,7 @@ impl<'a> Vessel<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_enumeration()?,
+            value: encoder::encode_enumeration(value)?,
         });
         let result = self.conn.execute_procedure("", "Vessel_set_Type", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -9509,6 +10757,10 @@ impl<'a> Waypoint<'a> {
     // methods
     pub async fn remove(&'a self) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_none(result)?;
         Ok(())
@@ -9526,7 +10778,7 @@ impl<'a> Waypoint<'a> {
         Ok(CelestialBody{id: return_value, conn: &self.conn})
     }
 
-    pub async fn set_body(&'a self) -> Result<(), error::Error> {
+    pub async fn set_body(&'a self, value: &CelestialBody<'_>) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -9534,7 +10786,7 @@ impl<'a> Waypoint<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_u64(0)?,
+            value: encoder::encode_u64(value.id)?,
         });
         let result = self.conn.execute_procedure("", "Waypoint_set_Body", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -9552,7 +10804,7 @@ impl<'a> Waypoint<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_name(&'a self) -> Result<(), error::Error> {
+    pub async fn set_name(&'a self, value: String) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -9560,7 +10812,7 @@ impl<'a> Waypoint<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_string()?,
+            value: encoder::encode_string(value)?,
         });
         let result = self.conn.execute_procedure("", "Waypoint_set_Name", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -9578,7 +10830,7 @@ impl<'a> Waypoint<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_color(&'a self) -> Result<(), error::Error> {
+    pub async fn set_color(&'a self, value: i32) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -9586,7 +10838,7 @@ impl<'a> Waypoint<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_sint32()?,
+            value: encoder::encode_sint32(value)?,
         });
         let result = self.conn.execute_procedure("", "Waypoint_set_Color", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -9604,7 +10856,7 @@ impl<'a> Waypoint<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_icon(&'a self) -> Result<(), error::Error> {
+    pub async fn set_icon(&'a self, value: String) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -9612,7 +10864,7 @@ impl<'a> Waypoint<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_string()?,
+            value: encoder::encode_string(value)?,
         });
         let result = self.conn.execute_procedure("", "Waypoint_set_Icon", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -9630,7 +10882,7 @@ impl<'a> Waypoint<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_latitude(&'a self) -> Result<(), error::Error> {
+    pub async fn set_latitude(&'a self, value: f64) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -9638,7 +10890,7 @@ impl<'a> Waypoint<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_double(0.0)?,
+            value: encoder::encode_double(value)?,
         });
         let result = self.conn.execute_procedure("", "Waypoint_set_Latitude", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -9656,7 +10908,7 @@ impl<'a> Waypoint<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_longitude(&'a self) -> Result<(), error::Error> {
+    pub async fn set_longitude(&'a self, value: f64) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -9664,7 +10916,7 @@ impl<'a> Waypoint<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_double(0.0)?,
+            value: encoder::encode_double(value)?,
         });
         let result = self.conn.execute_procedure("", "Waypoint_set_Longitude", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -9682,7 +10934,7 @@ impl<'a> Waypoint<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_mean_altitude(&'a self) -> Result<(), error::Error> {
+    pub async fn set_mean_altitude(&'a self, value: f64) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -9690,7 +10942,7 @@ impl<'a> Waypoint<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_double(0.0)?,
+            value: encoder::encode_double(value)?,
         });
         let result = self.conn.execute_procedure("", "Waypoint_set_MeanAltitude", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -9708,7 +10960,7 @@ impl<'a> Waypoint<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_surface_altitude(&'a self) -> Result<(), error::Error> {
+    pub async fn set_surface_altitude(&'a self, value: f64) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -9716,7 +10968,7 @@ impl<'a> Waypoint<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_double(0.0)?,
+            value: encoder::encode_double(value)?,
         });
         let result = self.conn.execute_procedure("", "Waypoint_set_SurfaceAltitude", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -9734,7 +10986,7 @@ impl<'a> Waypoint<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_bedrock_altitude(&'a self) -> Result<(), error::Error> {
+    pub async fn set_bedrock_altitude(&'a self, value: f64) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -9742,7 +10994,7 @@ impl<'a> Waypoint<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_double(0.0)?,
+            value: encoder::encode_double(value)?,
         });
         let result = self.conn.execute_procedure("", "Waypoint_set_BedrockAltitude", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -9828,15 +11080,59 @@ pub struct WaypointManager<'a> {
 }
 impl<'a> WaypointManager<'a> {
     // methods
-    pub async fn add_waypoint(&'a self) -> Result<Waypoint<'a>, error::Error> {
+    pub async fn add_waypoint(&'a self, latitude: f64, longitude: f64, body: &CelestialBody<'_>, name: String) -> Result<Waypoint<'a>, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_double(latitude)?,
+        });
+        arguments.push(schema::Argument {
+            position: 2,
+            value: encoder::encode_double(longitude)?,
+        });
+        arguments.push(schema::Argument {
+            position: 3,
+            value: encoder::encode_u64(body.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 4,
+            value: encoder::encode_string(name)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_class(result)?;
         Ok(Waypoint{id: return_value, conn: &self.conn})
     }
 
-    pub async fn add_waypoint_at_altitude(&'a self) -> Result<Waypoint<'a>, error::Error> {
+    pub async fn add_waypoint_at_altitude(&'a self, latitude: f64, longitude: f64, altitude: f64, body: &CelestialBody<'_>, name: String) -> Result<Waypoint<'a>, error::Error> {
         let mut arguments = Vec::new();
+        arguments.push(schema::Argument {
+            position: 0,
+            value: encoder::encode_u64(self.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 1,
+            value: encoder::encode_double(latitude)?,
+        });
+        arguments.push(schema::Argument {
+            position: 2,
+            value: encoder::encode_double(longitude)?,
+        });
+        arguments.push(schema::Argument {
+            position: 3,
+            value: encoder::encode_double(altitude)?,
+        });
+        arguments.push(schema::Argument {
+            position: 4,
+            value: encoder::encode_u64(body.id)?,
+        });
+        arguments.push(schema::Argument {
+            position: 5,
+            value: encoder::encode_string(name)?,
+        });
         let result = self.conn.execute_procedure("", "", arguments).await?;
         let return_value = decoder::decode_class(result)?;
         Ok(Waypoint{id: return_value, conn: &self.conn})
@@ -9956,7 +11252,7 @@ impl<'a> Wheel<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_brakes(&'a self) -> Result<(), error::Error> {
+    pub async fn set_brakes(&'a self, value: f32) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -9964,7 +11260,7 @@ impl<'a> Wheel<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_float(0.0)?,
+            value: encoder::encode_float(value)?,
         });
         let result = self.conn.execute_procedure("", "Wheel_set_Brakes", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -9982,7 +11278,7 @@ impl<'a> Wheel<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_auto_friction_control(&'a self) -> Result<(), error::Error> {
+    pub async fn set_auto_friction_control(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -9990,7 +11286,7 @@ impl<'a> Wheel<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "Wheel_set_AutoFrictionControl", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -10008,7 +11304,7 @@ impl<'a> Wheel<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_manual_friction_control(&'a self) -> Result<(), error::Error> {
+    pub async fn set_manual_friction_control(&'a self, value: f32) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -10016,7 +11312,7 @@ impl<'a> Wheel<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_float(0.0)?,
+            value: encoder::encode_float(value)?,
         });
         let result = self.conn.execute_procedure("", "Wheel_set_ManualFrictionControl", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -10045,7 +11341,7 @@ impl<'a> Wheel<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_deployed(&'a self) -> Result<(), error::Error> {
+    pub async fn set_deployed(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -10053,7 +11349,7 @@ impl<'a> Wheel<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "Wheel_set_Deployed", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -10082,7 +11378,7 @@ impl<'a> Wheel<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_motor_enabled(&'a self) -> Result<(), error::Error> {
+    pub async fn set_motor_enabled(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -10090,7 +11386,7 @@ impl<'a> Wheel<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "Wheel_set_MotorEnabled", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -10108,7 +11404,7 @@ impl<'a> Wheel<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_motor_inverted(&'a self) -> Result<(), error::Error> {
+    pub async fn set_motor_inverted(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -10116,7 +11412,7 @@ impl<'a> Wheel<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "Wheel_set_MotorInverted", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -10156,7 +11452,7 @@ impl<'a> Wheel<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_traction_control_enabled(&'a self) -> Result<(), error::Error> {
+    pub async fn set_traction_control_enabled(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -10164,7 +11460,7 @@ impl<'a> Wheel<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "Wheel_set_TractionControlEnabled", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -10182,7 +11478,7 @@ impl<'a> Wheel<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_traction_control(&'a self) -> Result<(), error::Error> {
+    pub async fn set_traction_control(&'a self, value: f32) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -10190,7 +11486,7 @@ impl<'a> Wheel<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_float(0.0)?,
+            value: encoder::encode_float(value)?,
         });
         let result = self.conn.execute_procedure("", "Wheel_set_TractionControl", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -10208,7 +11504,7 @@ impl<'a> Wheel<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_drive_limiter(&'a self) -> Result<(), error::Error> {
+    pub async fn set_drive_limiter(&'a self, value: f32) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -10216,7 +11512,7 @@ impl<'a> Wheel<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_float(0.0)?,
+            value: encoder::encode_float(value)?,
         });
         let result = self.conn.execute_procedure("", "Wheel_set_DriveLimiter", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -10245,7 +11541,7 @@ impl<'a> Wheel<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_steering_enabled(&'a self) -> Result<(), error::Error> {
+    pub async fn set_steering_enabled(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -10253,7 +11549,7 @@ impl<'a> Wheel<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "Wheel_set_SteeringEnabled", arguments).await?;
         let return_value = decoder::decode_none(result)?;
@@ -10271,7 +11567,7 @@ impl<'a> Wheel<'a> {
         Ok(return_value)
     }
 
-    pub async fn set_steering_inverted(&'a self) -> Result<(), error::Error> {
+    pub async fn set_steering_inverted(&'a self, value: bool) -> Result<(), error::Error> {
         let mut arguments = Vec::new();
         arguments.push(schema::Argument {
             position: 0,
@@ -10279,7 +11575,7 @@ impl<'a> Wheel<'a> {
         });
         arguments.push(schema::Argument {
             position: 1,
-            value: encoder::encode_bool()?,
+            value: encoder::encode_bool(value)?,
         });
         let result = self.conn.execute_procedure("", "Wheel_set_SteeringInverted", arguments).await?;
         let return_value = decoder::decode_none(result)?;

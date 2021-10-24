@@ -222,10 +222,43 @@ fn convert_method(property: &impl ParsedMethod, procedure: &original::Procedure)
         id: procedure.id,
         procedure: property.original_procedure_name(),
         name: property.function_name(),
+        arguments_signature: arguments_signature(&procedure),
         arguments: convert_arguments(&procedure),
         decoder_function: decoder_function(&procedure),
         return_type_signature: return_type_signature(&procedure),
         return_value: return_value(&procedure),
+    }
+}
+
+fn arguments_signature(procedure: &original::Procedure) -> String {
+    let arguments: Vec<String> = procedure.parameters.iter()
+        .filter(|param| param.name != "this")
+        .map(|param|
+            ", ".to_string() +
+            &param.name.to_case(Case::Snake) + ": " +
+            argument_type(param).as_str()
+        )
+        .collect();
+
+    arguments.join("")
+}
+
+fn argument_type(parameter: &original::Parameter) -> String {
+    match parameter.r#type.code {
+        original::Code::String => "String".to_string(),
+        original::Code::Bool => "bool".to_string(),
+        original::Code::Float => "f32".to_string(),
+        original::Code::Double => "f64".to_string(),
+        original::Code::Sint32 => "i32".to_string(),
+        original::Code::Uint32 => "u32".to_string(),
+        original::Code::Enumeration => "(/*enum*/)".to_string(),
+        original::Code::List => "(/*list*/)".to_string(),
+        original::Code::Dictionary => "(/*dict*/)".to_string(),
+        original::Code::Set => "(/*set*/)".to_string(),
+        original::Code::Tuple => "(/*tuple*/)".to_string(),
+        original::Code::Class => {
+            "&".to_string() + parameter.r#type.name.clone().unwrap().as_str() + "<'_>"
+        },
     }
 }
 
@@ -262,19 +295,23 @@ fn convert_single_argument(parameter: &original::Parameter, position: u64) -> ou
         original::Code::Class => "encode_u64".to_string(),
     };
     let value = match parameter.r#type.code {
-        original::Code::String => "".to_string(),
-        original::Code::Bool => "".to_string(),
-        original::Code::Float => "0.0".to_string(),
-        original::Code::Double => "0.0".to_string(),
-        original::Code::Sint32 => "".to_string(),
-        original::Code::Uint32 => "".to_string(),
-        original::Code::Enumeration => "".to_string(),
-        original::Code::List => "".to_string(),
-        original::Code::Dictionary => "".to_string(),
-        original::Code::Set => "".to_string(),
-        original::Code::Tuple => "".to_string(),
-        original::Code::Class => "0".to_string(), //parameter.r#type.name.clone().unwrap(),
+        original::Code::Class => parameter.name.to_case(Case::Snake) + ".id",
+        _ => parameter.name.to_case(Case::Snake),
     };
+    // let value = match parameter.r#type.code {
+    //     original::Code::String => "".to_string(),
+    //     original::Code::Bool => "".to_string(),
+    //     original::Code::Float => "0.0".to_string(),
+    //     original::Code::Double => "0.0".to_string(),
+    //     original::Code::Sint32 => "".to_string(),
+    //     original::Code::Uint32 => "".to_string(),
+    //     original::Code::Enumeration => "".to_string(),
+    //     original::Code::List => "".to_string(),
+    //     original::Code::Dictionary => "".to_string(),
+    //     original::Code::Set => "".to_string(),
+    //     original::Code::Tuple => "".to_string(),
+    //     original::Code::Class => "0".to_string(), //parameter.r#type.name.clone().unwrap(),
+    // };
     output::Argument {
         position,
         encoder_function,
