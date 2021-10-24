@@ -331,7 +331,11 @@ fn decoder_function(procedure: &original::Procedure) -> String {
                 original::Code::Sint32 => "decode_sint32".to_string(),
                 original::Code::Uint32 => "decode_uint32".to_string(),
                 original::Code::Enumeration => "decode_enumeration".to_string(),
-                original::Code::List => "decode_list".to_string(),
+                original::Code::List => {
+                    let types = (&return_type.types).clone().unwrap();
+                    let list_type_string = get_list_type(&types);
+                    format!("decode_list::<{}>", list_type_string).to_string()
+                },
                 original::Code::Dictionary => "decode_dictionary".to_string(),
                 original::Code::Set => "decode_set".to_string(),
                 original::Code::Tuple => "decode_tuple".to_string(),
@@ -339,6 +343,17 @@ fn decoder_function(procedure: &original::Procedure) -> String {
             }
         },
         None => "decode_none".to_string()
+    }
+}
+
+fn get_list_type(types: &Vec<original::Type>) -> String {
+    let list_type = types.get(0).unwrap();
+    match list_type.code {
+        original::Code::String => "String".to_string(),
+        original::Code::Class => {
+            list_type.name.clone().unwrap() + "<'_>"
+        },
+        _ => "(/*list*/)".to_string()
     }
 }
 
@@ -353,7 +368,11 @@ fn return_type_signature(procedure: &original::Procedure) -> String {
                 original::Code::Sint32 => "i32".to_string(),
                 original::Code::Uint32 => "u32".to_string(),
                 original::Code::Enumeration => "(/*enum*/)".to_string(),
-                original::Code::List => "(/*list*/)".to_string(),
+                original::Code::List => {
+                    let types = (&return_type.types).clone().unwrap();
+                    let list_type_string = get_list_type(&types);
+                    format!("Vec<{}>", list_type_string).to_string()
+                },
                 original::Code::Dictionary => "(/*dict*/)".to_string(),
                 original::Code::Set => "(/*set*/)".to_string(),
                 original::Code::Tuple => "(/*tuple*/)".to_string(),

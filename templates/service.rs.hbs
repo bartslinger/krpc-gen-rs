@@ -32,7 +32,7 @@ impl<'a> {{{ service_name }}}<'a> {
         });
         {{/each}}
         let result = self.conn.execute_procedure("{{{ ../service_name }}}", "{{{ procedure }}}", arguments).await?;
-        let return_value = decoder::{{{ decoder_function }}}(result)?;
+        let return_value = decoder::{{{ decoder_function }}}(result, self.conn)?;
         Ok({{{ method.return_value }}})
     }
 
@@ -53,7 +53,7 @@ impl<'a> {{{ service_name }}}<'a> {
         });
         {{/each}}
         let result = self.conn.execute_procedure("{{{ ../service_name }}}", "{{{ method.procedure }}}", arguments).await?;
-        let return_value = decoder::{{{ decoder_function }}}(result)?;
+        let return_value = decoder::{{{ decoder_function }}}(result, self.conn)?;
         Ok({{{ method.return_value }}})
     }
 
@@ -83,7 +83,7 @@ impl<'a> {{{ class.name }}}<'a> {
         });
         {{/each}}
         let result = self.conn.execute_procedure("{{{ ../../service_name }}}", "{{{ method.procedure }}}", arguments).await?;
-        let return_value = decoder::{{{ decoder_function }}}(result)?;
+        let return_value = decoder::{{{ decoder_function }}}(result, self.conn)?;
         Ok({{{ method.return_value }}})
     }
 
@@ -103,7 +103,7 @@ impl<'a> {{{ class.name }}}<'a> {
         });
         {{/each}}
         let result = self.conn.execute_procedure("{{{ ../../service_name }}}", "{{{ method.procedure }}}", arguments).await?;
-        let return_value = decoder::{{{ decoder_function }}}(result)?;
+        let return_value = decoder::{{{ decoder_function }}}(result, self.conn)?;
         Ok({{{ method.return_value }}})
     }
 
@@ -124,15 +124,24 @@ impl<'a> {{{ class.name }}}<'a> {
         });
         {{/each}}
         let result = conn.execute_procedure("{{{ ../../service_name }}}", "{{{ method.procedure }}}", arguments).await?;
-        let return_value = decoder::{{{ decoder_function }}}(result)?;
+        let return_value = decoder::{{{ decoder_function }}}(result, conn)?;
         Ok({{{ method.return_value }}})
     }
 
     {{/each}}
 
 }
+impl<'a> decoder::KRPCDecode<'a> for {{{ class.name }}}<'a> {
+    fn krpc_decode(input: Vec<u8>, conn: &'a Connection) -> Result<Self, decoder::Error> {
+        Ok(Self {
+            id: 0,
+            conn
+        })
+    }
+}
 
 {{/each}}
+
 
 {{#each enumerations as |enumeration| }}
 pub enum {{{enumeration.name}}}{
