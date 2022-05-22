@@ -48,15 +48,15 @@ pub struct Parameter {
 #[derive(Deserialize, Debug, Clone)]
 pub struct Type {
     pub code: Code,
-    service: Option<String>,
+    pub service: Option<String>,
     pub name: Option<String>,
 }
 
 #[derive(Deserialize, Debug, Clone)]
 pub struct ReturnType {
     pub code: Code,
-    pub types: Option<Vec<Type>>,
-    service: Option<String>,
+    pub types: Option<Vec<ReturnType>>,
+    pub service: Option<String>,
     pub name: Option<String>,
 }
 

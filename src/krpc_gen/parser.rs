@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use regex::Regex;
 use convert_case::{Case, Casing};
 use crate::original;
+use crate::original::ReturnType;
 use crate::output;
 
 trait ParsedMethod {
@@ -19,7 +20,7 @@ impl ParsedMethod for StandardMethod {
         self.procedure.clone()
     }
     fn function_name(&self) -> String {
-        self.name.to_case(Case::Snake)
+        self.name.to_case(Case::Camel)
     }
 }
 
@@ -34,7 +35,7 @@ impl ParsedMethod for ServiceProperty {
         self.procedure.clone()
     }
     fn function_name(&self) -> String {
-        self.prefix.clone() + self.name.to_case(Case::Snake).as_str()
+        self.prefix.clone() + self.name.to_case(Case::UpperCamel).as_str()
     }
 }
 
@@ -49,7 +50,7 @@ impl ParsedMethod for ClassMethod {
         self.procedure.clone()
     }
     fn function_name(&self) -> String {
-        self.method.to_case(Case::Snake)
+        self.method.to_case(Case::Camel)
     }
 }
 
@@ -65,7 +66,7 @@ impl ParsedMethod for ClassProperty {
         self.procedure.clone()
     }
     fn function_name(&self) -> String {
-        self.prefix.clone() + self.property.to_case(Case::Snake).as_str()
+        self.prefix.clone() + self.property.to_case(Case::Camel).as_str()
     }
 }
 
@@ -92,7 +93,7 @@ fn get_procedure_type(procedure_name: &str) -> ProcedureType {
                     procedure: procedure_name.to_string(),
                     class: (&cap[1]).to_string(),
                     property: (&cap[3]).to_string(),
-                    prefix: "get_".to_string(),
+                    prefix: "get".to_string(),
                 });
             },
             "set" => {
@@ -100,7 +101,7 @@ fn get_procedure_type(procedure_name: &str) -> ProcedureType {
                     procedure: procedure_name.to_string(),
                     class: (&cap[1]).to_string(),
                     property: (&cap[3]).to_string(),
-                    prefix: "set_".to_string(),
+                    prefix: "set".to_string(),
                 });
             },
             "static" => {
@@ -123,14 +124,14 @@ fn get_procedure_type(procedure_name: &str) -> ProcedureType {
                 return ProcedureType::PropertyGetter(ServiceProperty {
                     procedure: procedure_name.to_string(),
                     name: (&cap[2]).to_string(),
-                    prefix: "get_".to_string(),
+                    prefix: "get".to_string(),
                 })
             },
             "set" => {
                 return ProcedureType::PropertySetter(ServiceProperty {
                     procedure: procedure_name.to_string(),
                     name: (&cap[2]).to_string(),
-                    prefix: "set_".to_string(),
+                    prefix: "set".to_string(),
                 })
             },
             _ => {
@@ -237,42 +238,38 @@ fn convert_method(property: &impl ParsedMethod, procedure: &original::Procedure,
         name: property.function_name(),
         arguments_signature: arguments_signature(&procedure, is_static),
         arguments: convert_arguments(&procedure),
-        decoder_function: decoder_function(&procedure),
+        decoder_function: decoder_function(&procedure.return_type),
         return_type_signature: return_type_signature(&procedure),
         return_value: return_value(&procedure, is_static),
     }
 }
 
 fn arguments_signature(procedure: &original::Procedure, is_static: bool) -> String {
-    let first_argument = if is_static { "conn: &'a Connection" } else { "&'a self" }.to_string();
     let arguments: Vec<String> = procedure.parameters.iter()
         .filter(|param| param.name != "this")
         .map(|param|
-            param.name.to_case(Case::Snake) + ": " +
+            param.name.to_case(Case::Camel) + ": " +
             argument_type(param).as_str()
         )
         .collect();
 
-    let arguments = [Vec::from([first_argument]), arguments].concat();
     arguments.join(", ")
 }
 
 fn argument_type(parameter: &original::Parameter) -> String {
     match parameter.r#type.code {
-        original::Code::String => "String".to_string(),
-        original::Code::Bool => "bool".to_string(),
-        original::Code::Float => "f32".to_string(),
-        original::Code::Double => "f64".to_string(),
-        original::Code::Sint32 => "i32".to_string(),
-        original::Code::Uint32 => "u32".to_string(),
+        original::Code::String => "string".to_string(),
+        original::Code::Bool => "boolean".to_string(),
+        original::Code::Float => "number".to_string(),
+        original::Code::Double => "number".to_string(),
+        original::Code::Sint32 => "number".to_string(),
+        original::Code::Uint32 => "number".to_string(),
         original::Code::Enumeration => parameter.r#type.name.clone().unwrap(),
-        original::Code::List => "(/*list*/)".to_string(),
-        original::Code::Dictionary => "(/*dict*/)".to_string(),
-        original::Code::Set => "(/*set*/)".to_string(),
-        original::Code::Tuple => "(/*tuple*/)".to_string(),
-        original::Code::Class => {
-            "&".to_string() + parameter.r#type.name.clone().unwrap().as_str() + "<'_>"
-        },
+        original::Code::List => "void /*list*/".to_string(),
+        original::Code::Dictionary => "void /*dict*/".to_string(),
+        original::Code::Set => "void /*set*/".to_string(),
+        original::Code::Tuple => "void /*tuple*/".to_string(),
+        original::Code::Class => parameter.r#type.name.clone().unwrap(),
     }
 }
 
@@ -290,28 +287,28 @@ fn convert_single_argument(parameter: &original::Parameter, position: u64) -> ou
     if parameter.name == "this" {
         return output::Argument {
             position: 0,
-            encoder_function: "encode_u64".to_string(),
+            encoder_function: "encoding.encode_u64".to_string(),
             value: "self.id".to_string(),
         };
     }
     let encoder_function = match parameter.r#type.code {
-        original::Code::String => "encode_string".to_string(),
-        original::Code::Bool => "encode_bool".to_string(),
-        original::Code::Float => "encode_float".to_string(),
-        original::Code::Double => "encode_double".to_string(),
-        original::Code::Sint32 => "encode_sint32".to_string(),
-        original::Code::Uint32 => "encode_uint32".to_string(),
-        original::Code::Enumeration => "encode_u64".to_string(),
-        original::Code::List => "encode_list".to_string(),
-        original::Code::Dictionary => "encode_dictionary".to_string(),
-        original::Code::Set => "encode_set".to_string(),
-        original::Code::Tuple => "encode_tuple".to_string(),
-        original::Code::Class => "encode_u64".to_string(),
+        original::Code::String => "encoding.encodeString".to_string(),
+        original::Code::Bool => "encoding.encodeBool".to_string(),
+        original::Code::Float => "encoding.encodeFloat".to_string(),
+        original::Code::Double => "encoding.encodeDouble".to_string(),
+        original::Code::Sint32 => "encoding.encodeSint32".to_string(),
+        original::Code::Uint32 => "encoding.encodeUint32".to_string(),
+        original::Code::Enumeration => "encoding.encodeEnum".to_string(),
+        original::Code::List => "encoding.encodeList".to_string(),
+        original::Code::Dictionary => "encoding.encodeDict".to_string(),
+        original::Code::Set => "encoding.encodeSet".to_string(),
+        original::Code::Tuple => "encoding.encodeTuple".to_string(),
+        original::Code::Class => "encoding.encodeClass".to_string(),
     };
     let value = match parameter.r#type.code {
-        original::Code::Class => parameter.name.to_case(Case::Snake) + ".id",
-        original::Code::Enumeration => parameter.name.to_case(Case::Snake) + " as u64",
-        _ => parameter.name.to_case(Case::Snake),
+        original::Code::Class => parameter.name.to_case(Case::Camel) + ".id",
+        original::Code::Enumeration => parameter.name.to_case(Case::Camel) + " as u64",
+        _ => parameter.name.to_case(Case::Camel),
     };
     output::Argument {
         position,
@@ -320,69 +317,74 @@ fn convert_single_argument(parameter: &original::Parameter, position: u64) -> ou
     }
 }
 
-fn decoder_function(procedure: &original::Procedure) -> String {
-    match &procedure.return_type {
+fn decoder_function(return_type: &Option<ReturnType>) -> String {
+    match return_type {
         Some(return_type) => {
             match &return_type.code {
-                original::Code::String => "decode_string".to_string(),
-                original::Code::Bool => "decode_bool".to_string(),
-                original::Code::Float => "decode_float".to_string(),
-                original::Code::Double => "decode_double".to_string(),
-                original::Code::Sint32 => "decode_sint32".to_string(),
-                original::Code::Uint32 => "decode_uint32".to_string(),
-                original::Code::Enumeration => "decode_enumeration".to_string(),
+                original::Code::String => "encoding.decodeString(this.conn, result)".to_string(),
+                original::Code::Bool => "encoding.decodeBool(this.conn, result)".to_string(),
+                original::Code::Float => "encoding.decodeFloat(this.conn, result)".to_string(),
+                original::Code::Double => "encoding.decodeDouble(this.conn, result)".to_string(),
+                original::Code::Sint32 => "encoding.decodeSint32(this.conn, result)".to_string(),
+                original::Code::Uint32 => "encoding.decodeUint32(this.conn, result)".to_string(),
+                original::Code::Enumeration => "encoding.decodeEnum(this.conn, result)".to_string(),
                 original::Code::List => {
+                    println!("{:?}", &return_type.types);
                     let types = (&return_type.types).clone().unwrap();
-                    let list_type_string = get_list_type(&types);
-                    format!("decode_list::<{}>", list_type_string).to_string()
+                    let list_item_type = types.get(0).unwrap();
+                    let list_item_decoder_function = decoder_function(&Some(list_item_type.clone()));
+                    format!("encoding.decodeList(this.conn, result.value).items.map((item) => {{ return {}}})", list_item_decoder_function).to_string()
                 },
-                original::Code::Dictionary => "decode_dictionary".to_string(),
-                original::Code::Set => "decode_set".to_string(),
-                original::Code::Tuple => "decode_tuple".to_string(),
-                original::Code::Class => "decode_class".to_string(),
+                original::Code::Dictionary => "encoding.decodeDict(this.conn, result)".to_string(),
+                original::Code::Set => "encoding.decodeSet(this.conn, result)".to_string(),
+                original::Code::Tuple => "encoding.decodeTuple(this.conn, result)".to_string(),
+                original::Code::Class => {
+                    format!("{}.decode(this.conn, result)", &return_type.name.clone().unwrap()).to_string()
+                },
             }
         },
-        None => "decode_none".to_string()
+        None => "undefined".to_string()
     }
 }
 
-fn get_list_type(types: &Vec<original::Type>) -> String {
+fn get_list_type(types: &Vec<original::ReturnType>) -> String {
     let list_type = types.get(0).unwrap();
     match list_type.code {
-        original::Code::String => "String".to_string(),
+        original::Code::String => "string".to_string(),
         original::Code::Class => {
-            list_type.name.clone().unwrap() + "<'_>"
+            list_type.name.clone().unwrap()
         },
-        _ => "(/*list*/)".to_string()
+        _ => "void /*list*/".to_string()
     }
 }
+
 
 fn return_type_signature(procedure: &original::Procedure) -> String {
     match &procedure.return_type {
         Some(return_type) => {
             match &return_type.code {
-                original::Code::String => "String".to_string(),
-                original::Code::Bool => "bool".to_string(),
-                original::Code::Float => "f32".to_string(),
-                original::Code::Double => "f64".to_string(),
-                original::Code::Sint32 => "i32".to_string(),
-                original::Code::Uint32 => "u32".to_string(),
-                original::Code::Enumeration => "(/*enum*/)".to_string(),
+                original::Code::String => "string".to_string(),
+                original::Code::Bool => "boolean".to_string(),
+                original::Code::Float => "number".to_string(),
+                original::Code::Double => "number".to_string(),
+                original::Code::Sint32 => "number".to_string(),
+                original::Code::Uint32 => "number".to_string(),
+                original::Code::Enumeration => "void /*enum*/".to_string(),
                 original::Code::List => {
                     let types = (&return_type.types).clone().unwrap();
                     let list_type_string = get_list_type(&types);
-                    format!("Vec<{}>", list_type_string).to_string()
+                    format!("{}[]", list_type_string).to_string()
                 },
-                original::Code::Dictionary => "(/*dict*/)".to_string(),
-                original::Code::Set => "(/*set*/)".to_string(),
-                original::Code::Tuple => "(/*tuple*/)".to_string(),
+                original::Code::Dictionary => "void /*dict*/".to_string(),
+                original::Code::Set => "void /*set*/".to_string(),
+                original::Code::Tuple => "void /*tuple*/".to_string(),
                 original::Code::Class => {
-                    return_type.name.clone().unwrap() + "<'a>"
+                    return_type.name.clone().unwrap()
                 },
             }
         },
         None => {
-            "()".to_string()
+            "void".to_string()
         },
     }
 }

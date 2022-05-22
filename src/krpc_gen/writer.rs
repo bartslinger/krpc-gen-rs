@@ -6,7 +6,7 @@ use crate::output;
 pub fn write_to_file(service_name: &str, path: &std::path::Path, output_structure: &output::OutputStructure) {
     let mut handlebars = handlebars::Handlebars::new();
     
-    let template_bytes = std::include_bytes!("../../templates/service.rs.hbs");
+    let template_bytes = std::include_bytes!("../../templates/service.ts.hbs");
     handlebars.register_template_string("template", String::from_utf8_lossy(template_bytes)).unwrap();
 
     let mut output_file = File::create(path).unwrap();
