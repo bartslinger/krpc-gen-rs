@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use regex::Regex;
 use convert_case::{Case, Casing};
-use crate::original;
+use crate::original::{self, Type};
 use crate::original::ReturnType;
 use crate::output;
 
@@ -249,27 +249,33 @@ fn arguments_signature(procedure: &original::Procedure, is_static: bool) -> Stri
         .filter(|param| param.name != "this")
         .map(|param|
             param.name.to_case(Case::Camel) + ": " +
-            argument_type(param).as_str()
+            argument_type(&param.r#type).as_str()
         )
         .collect();
 
     arguments.join(", ")
 }
 
-fn argument_type(parameter: &original::Parameter) -> String {
-    match parameter.r#type.code {
+fn argument_type(argument: &Type) -> String {
+    match argument.code {
         original::Code::String => "string".to_string(),
         original::Code::Bool => "boolean".to_string(),
         original::Code::Float => "number".to_string(),
         original::Code::Double => "number".to_string(),
         original::Code::Sint32 => "number".to_string(),
         original::Code::Uint32 => "number".to_string(),
-        original::Code::Enumeration => parameter.r#type.name.clone().unwrap(),
+        original::Code::Enumeration => argument.name.clone().unwrap(),
         original::Code::List => "void /*list*/".to_string(),
         original::Code::Dictionary => "void /*dict*/".to_string(),
         original::Code::Set => "void /*set*/".to_string(),
-        original::Code::Tuple => "void /*tuple*/".to_string(),
-        original::Code::Class => parameter.r#type.name.clone().unwrap(),
+        original::Code::Tuple => {
+            let types = argument.types.clone().unwrap();
+            let tuple_type: Vec<String> = types.iter()
+                .map(|x| argument_type(x))
+                .collect();
+            format!("[{}]", tuple_type.join(", ")).to_string()
+        },
+        original::Code::Class => argument.name.clone().unwrap(),
     }
 }
 
@@ -321,23 +327,22 @@ fn decoder_function(return_type: &Option<ReturnType>) -> String {
     match return_type {
         Some(return_type) => {
             match &return_type.code {
-                original::Code::String => "encoding.decodeString(this.conn, result)".to_string(),
-                original::Code::Bool => "encoding.decodeBool(this.conn, result)".to_string(),
-                original::Code::Float => "encoding.decodeFloat(this.conn, result)".to_string(),
-                original::Code::Double => "encoding.decodeDouble(this.conn, result)".to_string(),
-                original::Code::Sint32 => "encoding.decodeSint32(this.conn, result)".to_string(),
-                original::Code::Uint32 => "encoding.decodeUint32(this.conn, result)".to_string(),
-                original::Code::Enumeration => "encoding.decodeEnum(this.conn, result)".to_string(),
+                original::Code::String => "encoding.decodeString(this.conn, result.value)".to_string(),
+                original::Code::Bool => "encoding.decodeBool(this.conn, result.value)".to_string(),
+                original::Code::Float => "encoding.decodeFloat(this.conn, result.value)".to_string(),
+                original::Code::Double => "encoding.decodeDouble(this.conn, result.value)".to_string(),
+                original::Code::Sint32 => "encoding.decodeSint32(this.conn, result.value)".to_string(),
+                original::Code::Uint32 => "encoding.decodeUint32(this.conn, result.value)".to_string(),
+                original::Code::Enumeration => "encoding.decodeEnum(this.conn, result.value)".to_string(),
                 original::Code::List => {
-                    println!("{:?}", &return_type.types);
                     let types = (&return_type.types).clone().unwrap();
                     let list_item_type = types.get(0).unwrap();
                     let list_item_decoder_function = decoder_function(&Some(list_item_type.clone()));
                     format!("encoding.decodeList(this.conn, result.value).items.map((item) => {{ return {}}})", list_item_decoder_function).to_string()
                 },
-                original::Code::Dictionary => "encoding.decodeDict(this.conn, result)".to_string(),
-                original::Code::Set => "encoding.decodeSet(this.conn, result)".to_string(),
-                original::Code::Tuple => "encoding.decodeTuple(this.conn, result)".to_string(),
+                original::Code::Dictionary => "encoding.decodeDict(this.conn, result.value)".to_string(),
+                original::Code::Set => "encoding.decodeSet(this.conn, result.value)".to_string(),
+                original::Code::Tuple => "encoding.decodeTuple(this.conn, result.value)".to_string(),
                 original::Code::Class => {
                     format!("{}.decode(this.conn, result)", &return_type.name.clone().unwrap()).to_string()
                 },
