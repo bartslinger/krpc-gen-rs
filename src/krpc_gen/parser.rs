@@ -239,7 +239,7 @@ fn convert_method(property: &impl ParsedMethod, procedure: &original::Procedure,
         arguments_signature: arguments_signature(&procedure, is_static),
         arguments: convert_arguments(&procedure),
         decoder_function: decoder_function(&procedure.return_type),
-        return_type_signature: return_type_signature(&procedure),
+        return_type_signature: return_type_signature(&procedure.return_type),
         return_value: return_value(&procedure, is_static),
     }
 }
@@ -309,7 +309,7 @@ fn convert_single_argument(parameter: &original::Parameter, position: u64) -> ou
         original::Code::Dictionary => "encoding.encodeDict".to_string(),
         original::Code::Set => "encoding.encodeSet".to_string(),
         original::Code::Tuple => "encoding.encodeTuple".to_string(),
-        original::Code::Class => "encoding.encodeClass".to_string(),
+        original::Code::Class => "encoding.encodeVarint64".to_string(),
     };
     let value = match parameter.r#type.code {
         original::Code::Class => parameter.name.to_case(Case::Camel) + ".id",
@@ -364,8 +364,8 @@ fn get_list_type(types: &Vec<original::ReturnType>) -> String {
 }
 
 
-fn return_type_signature(procedure: &original::Procedure) -> String {
-    match &procedure.return_type {
+fn return_type_signature(return_type: &Option<original::ReturnType>) -> String {
+    match return_type {
         Some(return_type) => {
             match &return_type.code {
                 original::Code::String => "string".to_string(),
@@ -382,7 +382,13 @@ fn return_type_signature(procedure: &original::Procedure) -> String {
                 },
                 original::Code::Dictionary => "void /*dict*/".to_string(),
                 original::Code::Set => "void /*set*/".to_string(),
-                original::Code::Tuple => "void /*tuple*/".to_string(),
+                original::Code::Tuple => {
+                    let types = return_type.types.clone().unwrap();
+                    let tuple_type: Vec<String> = types.into_iter()
+                        .map(|x| return_type_signature(&Some(x)))
+                        .collect();
+                    format!("[{}]", tuple_type.join(", ")).to_string()
+                },
                 original::Code::Class => {
                     return_type.name.clone().unwrap()
                 },
