@@ -34,6 +34,8 @@ pub struct Argument {
     pub position: u64,
     pub encoder_function: String,
     pub value: String,
+    pub optional: bool,
+    pub name: String,
 }
 
 #[derive(Serialize, Debug, Clone, Default, Eq, PartialEq, Ord, PartialOrd)]

@@ -25,14 +25,19 @@ export class {{{ service_name }}} {
   async {{{ method.name }}}({{{ method.arguments_signature }}}): Promise<{{{ method.return_type_signature }}}> {
     const conn = this.conn;
     {{#if method.arguments }}
-    const args = [
+    const args: krpc.Argument[] = [];
     {{#each method.arguments as |argument|}}
-      {
-        position: {{{ argument.position }}},
-        value: {{{ argument.encoder_function }}}({{{ argument.value }}}),
-      },
+    {{#if argument.optional}}
+    if ({{{ argument.name }}} !== undefined) {
+    {{/if}}
+    args.push({
+      position: {{{ argument.position }}},
+      value: {{{ argument.encoder_function }}}({{{ argument.value }}}),
+    });
+    {{#if argument.optional}}
+    }
+    {{/if}}
     {{/each}}
-    ];
     {{else}}
     const args: Array<krpc.Argument> = [];
     {{/if}}
@@ -63,14 +68,19 @@ export class {{{ service_name }}} {
   async {{{ method.name }}}({{{ method.arguments_signature }}}): Promise<{{{ method.return_type_signature }}}> {
     const conn = this.conn;
     {{#if method.arguments }}
-    const args = [
+    const args: krpc.Argument[] = [];
     {{#each method.arguments as |argument|}}
-      {
-        position: {{{ argument.position }}},
-        value: {{{ argument.encoder_function }}}({{{ argument.value }}}),
-      },
+    {{#if argument.optional}}
+    if ({{{ argument.name }}} !== undefined) {
+    {{/if}}
+    args.push({
+      position: {{{ argument.position }}},
+      value: {{{ argument.encoder_function }}}({{{ argument.value }}}),
+    });
+    {{#if argument.optional}}
+    }
+    {{/if}}
     {{/each}}
-    ];
     {{else}}
     const args: Array<krpc.Argument> = [];
     {{/if}}
@@ -116,14 +126,19 @@ export class {{{ class.name }}} {
   async {{{ method.name }}}({{{ method.arguments_signature }}}): Promise<{{{ method.return_type_signature }}}> {
     const conn = this.conn;
     {{#if method.arguments }}
-    const args = [
+    const args: krpc.Argument[] = [];
     {{#each method.arguments as |argument|}}
-      {
-        position: {{{ argument.position }}},
-        value: {{{ argument.encoder_function }}}({{{ argument.value }}}),
-      },
+    {{#if argument.optional}}
+    if ({{{ argument.name }}} !== undefined) {
+    {{/if}}
+    args.push({
+      position: {{{ argument.position }}},
+      value: {{{ argument.encoder_function }}}({{{ argument.value }}}),
+    });
+    {{#if argument.optional}}
+    }
+    {{/if}}
     {{/each}}
-    ];
     {{else}}
     const args: Array<krpc.Argument> = [];
     {{/if}}
@@ -154,14 +169,19 @@ export class {{{ class.name }}} {
   async {{{ method.name }}}({{{ method.arguments_signature }}}): Promise<{{{ method.return_type_signature }}}> {
     const conn = this.conn;
     {{#if method.arguments }}
-    const args = [
+    const args: krpc.Argument[] = [];
     {{#each method.arguments as |argument|}}
-      {
-        position: {{{ argument.position }}},
-        value: {{{ argument.encoder_function }}}({{{ argument.value }}}),
-      },
+    {{#if argument.optional}}
+    if ({{{ argument.name }}} !== undefined) {
+    {{/if}}
+    args.push({
+      position: {{{ argument.position }}},
+      value: {{{ argument.encoder_function }}}({{{ argument.value }}}),
+    });
+    {{#if argument.optional}}
+    }
+    {{/if}}
     {{/each}}
-    ];
     {{else}}
     const args: Array<krpc.Argument> = [];
     {{/if}}
@@ -189,14 +209,19 @@ export class {{{ class.name }}} {
   {{#each class.static_methods as |method| }}
   static async {{{ method.name }}}(conn: KRPCConnection, {{{ method.arguments_signature }}}): Promise<{{{ method.return_type_signature }}}> {
     {{#if method.arguments }}
-    const args = [
+    const args: krpc.Argument[] = [];
     {{#each method.arguments as |argument|}}
-      {
-        position: {{{ argument.position }}},
-        value: {{{ argument.encoder_function }}}({{{ argument.value }}}),
-      },
+    {{#if argument.optional}}
+    if ({{{ argument.name }}} !== undefined) {
+    {{/if}}
+    args.push({
+      position: {{{ argument.position }}},
+      value: {{{ argument.encoder_function }}}({{{ argument.value }}}),
+    });
+    {{#if argument.optional}}
+    }
+    {{/if}}
     {{/each}}
-    ];
     {{else}}
     const args: Array<krpc.Argument> = [];
     {{/if}}

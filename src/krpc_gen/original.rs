@@ -43,6 +43,7 @@ pub struct Procedure {
 pub struct Parameter {
     pub name: String,
     pub r#type: Type,
+    pub default_value: Option<String>,
 }
 
 #[derive(Deserialize, Debug, Clone)]

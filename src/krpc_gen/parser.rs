@@ -249,12 +249,19 @@ fn arguments_signature(procedure: &original::Procedure, is_static: bool) -> Stri
     let arguments: Vec<String> = procedure.parameters.iter()
         .filter(|param| param.name != "this")
         .map(|param|
-            param.name.to_case(Case::Camel) + ": " +
+            param.name.to_case(Case::Camel) + questionmark_if_optional(&param).as_str() + ": " +
             argument_type(&param.r#type).as_str()
         )
         .collect();
 
     arguments.join(", ")
+}
+
+fn questionmark_if_optional(param: &original::Parameter) -> String {
+    match param.default_value {
+        Some(_) => "?".to_string(),
+        _ => "".to_string()
+    }
 }
 
 fn argument_type(argument: &Type) -> String {
@@ -296,6 +303,11 @@ fn convert_single_argument(parameter: &original::Parameter, position: u64) -> ou
             position: 0,
             encoder_function: "encoding.encodeVarint64".to_string(),
             value: "this.id".to_string(),
+            optional: match parameter.default_value {
+                Some(_) => true,
+                _ => false,
+            },
+            name: parameter.name.clone(),
         };
     }
     let encoder_function = match parameter.r#type.code {
@@ -321,6 +333,11 @@ fn convert_single_argument(parameter: &original::Parameter, position: u64) -> ou
         position,
         encoder_function,
         value,
+        optional: match parameter.default_value {
+            Some(_) => true,
+            _ => false,
+        },
+        name: parameter.name.clone(),
     }
 }
 
