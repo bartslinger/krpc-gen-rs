@@ -23,6 +23,7 @@ export class {{{ service_name }}} {
 
   {{#each service_methods as |method|}}
   async {{{ method.name }}}({{{ method.arguments_signature }}}): Promise<{{{ method.return_type_signature }}}> {
+    const conn = this.conn;
     {{#if method.arguments }}
     const args = [
     {{#each method.arguments as |argument|}}
@@ -60,6 +61,7 @@ export class {{{ service_name }}} {
 
   {{#each service_getters_setters as |method|}}
   async {{{ method.name }}}({{{ method.arguments_signature }}}): Promise<{{{ method.return_type_signature }}}> {
+    const conn = this.conn;
     {{#if method.arguments }}
     const args = [
     {{#each method.arguments as |argument|}}
@@ -112,6 +114,7 @@ export class {{{ class.name }}} {
   {{#each class.methods as |method|}}
 
   async {{{ method.name }}}({{{ method.arguments_signature }}}): Promise<{{{ method.return_type_signature }}}> {
+    const conn = this.conn;
     {{#if method.arguments }}
     const args = [
     {{#each method.arguments as |argument|}}
@@ -149,6 +152,7 @@ export class {{{ class.name }}} {
 
   {{#each class.getters_setters as |method| }}
   async {{{ method.name }}}({{{ method.arguments_signature }}}): Promise<{{{ method.return_type_signature }}}> {
+    const conn = this.conn;
     {{#if method.arguments }}
     const args = [
     {{#each method.arguments as |argument|}}
@@ -181,102 +185,40 @@ export class {{{ class.name }}} {
   }
 
   {{/each}}
+  // static methods
+  {{#each class.static_methods as |method| }}
+  static async {{{ method.name }}}(conn: KRPCConnection, {{{ method.arguments_signature }}}): Promise<{{{ method.return_type_signature }}}> {
+    {{#if method.arguments }}
+    const args = [
+    {{#each method.arguments as |argument|}}
+      {
+        position: {{{ argument.position }}},
+        value: {{{ argument.encoder_function }}}({{{ argument.value }}}),
+      },
+    {{/each}}
+    ];
+    {{else}}
+    const args: Array<krpc.Argument> = [];
+    {{/if}}
+    const procedureCall = krpc.ProcedureCall.fromPartial({
+      service: "{{{ ../service_name }}}",
+      procedure: "{{{ procedure }}}",
+      arguments: args,
+    });
+    // eslint-disable-next-line no-unused-vars
+    const result = await new Promise<krpc.ProcedureResult>(
+      (resolve, reject) => {
+        conn.scheduleProcedureCall({
+          procedureCall,
+          resolve,
+          reject,
+        });
+      }
+    );
+    {{{ before_return }}}
+    return {{{ decoder_function }}};
+  }
+
+  {{/each}}
 }
 {{/each}}
-
-
-{{!-- impl<'a> {{{ service_name }}}<'a> {
-    {{/each}}
-}
-
-// Classes
-{{#each classes as |class| }}
-#[derive(Debug)]
-pub struct {{{ class.name }}}<'a> {
-    id: u64,
-    conn: &'a Connection,
-}
-impl<'a> {{{ class.name }}}<'a> {
-    // methods
-    {{#each class.methods as |method| }}
-    pub async fn {{{ method.name }}}({{{ method.arguments_signature}}}) -> Result<{{{ method.return_type_signature }}}, error::Error> {
-        {{#if method.arguments }}
-        let mut arguments = Vec::new();
-        {{else}}
-        let arguments = Vec::new();
-        {{/if}}
-        {{#each method.arguments as |argument| }}
-        arguments.push(schema::Argument {
-            position: {{{argument.position}}},
-            value: encoder::{{{ argument.encoder_function }}}({{{ argument.value }}})?,
-        });
-        {{/each}}
-        let result = self.conn.execute_procedure("{{{ ../../service_name }}}", "{{{ method.procedure }}}", arguments).await?;
-        let return_value = decoder::{{{ decoder_function }}}(result, self.conn)?;
-        Ok({{{ method.return_value }}})
-    }
-
-    {{/each}}
-    // getters and setters
-    {{#each class.getters_setters as |method| }}
-    pub async fn {{{ method.name }}}({{{ method.arguments_signature}}}) -> Result<{{{ method.return_type_signature }}}, error::Error> {
-        {{#if method.arguments }}
-        let mut arguments = Vec::new();
-        {{else}}
-        let arguments = Vec::new();
-        {{/if}}
-        {{#each method.arguments as |argument| }}
-        arguments.push(schema::Argument {
-            position: {{{argument.position}}},
-            value: encoder::{{{ argument.encoder_function }}}({{{ argument.value }}})?,
-        });
-        {{/each}}
-        let result = self.conn.execute_procedure("{{{ ../../service_name }}}", "{{{ method.procedure }}}", arguments).await?;
-        let return_value = decoder::{{{ decoder_function }}}(result, self.conn)?;
-        Ok({{{ method.return_value }}})
-    }
-
-    {{/each}}
-    
-    // static methods
-    {{#each class.static_methods as |method| }}
-    pub async fn {{{ method.name }}}({{{ method.arguments_signature}}}) -> Result<{{{ method.return_type_signature }}}, error::Error> {
-        {{#if method.arguments }}
-        let mut arguments = Vec::new();
-        {{else}}
-        let arguments = Vec::new();
-        {{/if}}
-        {{#each method.arguments as |argument| }}
-        arguments.push(schema::Argument {
-            position: {{{argument.position}}},
-            value: encoder::{{{ argument.encoder_function }}}({{{ argument.value }}})?,
-        });
-        {{/each}}
-        let result = conn.execute_procedure("{{{ ../../service_name }}}", "{{{ method.procedure }}}", arguments).await?;
-        let return_value = decoder::{{{ decoder_function }}}(result, conn)?;
-        Ok({{{ method.return_value }}})
-    }
-
-    {{/each}}
-
-}
-impl<'a> decoder::KRPCDecode<'a> for {{{ class.name }}}<'a> {
-    fn krpc_decode(input: Vec<u8>, conn: &'a Connection) -> Result<Self, decoder::Error> {
-        Ok(Self {
-            id: decoder::decode_class(input, conn)?,
-            conn
-        })
-    }
-}
-
-{{/each}}
-
-
-{{#each enumerations as |enumeration| }}
-pub enum {{{enumeration.name}}}{
-    {{#each enumeration.values as |value|}}
-    {{{value.name}}} = {{{ value.id }}},
-    {{/each}}    
-}
-
-{{/each}} --}}

@@ -266,9 +266,9 @@ fn argument_type(argument: &Type) -> String {
         original::Code::Sint32 => "number".to_string(),
         original::Code::Uint32 => "number".to_string(),
         original::Code::Enumeration => argument.name.clone().unwrap(),
-        original::Code::List => "void /*list*/".to_string(),
-        original::Code::Dictionary => "void /*dict*/".to_string(),
-        original::Code::Set => "void /*set*/".to_string(),
+        original::Code::List => "---- /*list*/".to_string(),
+        original::Code::Dictionary => "---- /*dict*/".to_string(),
+        original::Code::Set => "---- /*set*/".to_string(),
         original::Code::Tuple => {
             let types = argument.types.clone().unwrap();
             let tuple_type: Vec<String> = types.iter()
@@ -328,13 +328,13 @@ fn decoder_function(return_type: &Option<ReturnType>, input: String) -> String {
     match return_type {
         Some(return_type) => {
             match &return_type.code {
-                original::Code::String => format!("encoding.decodeString(this.conn, {})", input).to_string(),
-                original::Code::Bool => format!("encoding.decodeBool(this.conn, {})", input).to_string(),
-                original::Code::Float => format!("encoding.decodeFloat(this.conn, {})", input).to_string(),
-                original::Code::Double => format!("encoding.decodeDouble(this.conn, {})", input).to_string(),
-                original::Code::Sint32 => format!("encoding.decodeSint32(this.conn, {})", input).to_string(),
-                original::Code::Uint32 => format!("encoding.decodeUint32(this.conn, {})", input).to_string(),
-                original::Code::Enumeration => format!("encoding.decodeEnum(this.conn, {})", input).to_string(),
+                original::Code::String => format!("encoding.decodeString(conn, {})", input).to_string(),
+                original::Code::Bool => format!("encoding.decodeBool(conn, {})", input).to_string(),
+                original::Code::Float => format!("encoding.decodeFloat(conn, {})", input).to_string(),
+                original::Code::Double => format!("encoding.decodeDouble(conn, {})", input).to_string(),
+                original::Code::Sint32 => format!("encoding.decodeSint32(conn, {})", input).to_string(),
+                original::Code::Uint32 => format!("encoding.decodeUint32(conn, {})", input).to_string(),
+                original::Code::Enumeration => format!("enumValue").to_string(),
                 original::Code::List => {
                     let types = (&return_type.types).clone().unwrap();
                     let list_item_type = types.get(0).unwrap();
@@ -358,7 +358,7 @@ fn decoder_function(return_type: &Option<ReturnType>, input: String) -> String {
                     format!("[{}]", test.join(", ")).to_string()
                 },
                 original::Code::Class => {
-                    format!("{}.decode(this.conn, {})", &return_type.name.clone().unwrap(), input).to_string()
+                    format!("{}.decode(conn, {})", &return_type.name.clone().unwrap(), input).to_string()
                 },
             }
         },
@@ -371,18 +371,21 @@ fn before_return(return_type: &Option<ReturnType>) -> String {
         Some(return_type) => {
             match &return_type.code {
                 original::Code::List => {
-                    format!("const list = encoding.decodeList(this.conn, result.value).items;").to_string()
+                    format!("const list = encoding.decodeList(conn, result.value).items;").to_string()
                 }
                 original::Code::Set => {
                     let types = (&return_type.types).clone().unwrap();
                     let set_type = types.get(0).unwrap().clone();
-                    format!("const set: {} = new Set(); encoding.decodeSet(this.conn, result.value).items.forEach((item) => {{ set.add({});}});", return_type_signature(&Some(return_type.clone())), decoder_function(&Some(set_type), "item".to_string())).to_string()
+                    format!("const set: {} = new Set(); encoding.decodeSet(conn, result.value).items.forEach((item) => {{ set.add({});}});", return_type_signature(&Some(return_type.clone())), decoder_function(&Some(set_type), "item".to_string())).to_string()
                 },
                 original::Code::Tuple => {
-                    format!("const tuple = encoding.decodeTuple(this.conn, result.value).items;").to_string()
+                    format!("const tuple = encoding.decodeTuple(conn, result.value).items;").to_string()
                 },
                 original::Code::Dictionary => {
-                    format!("const dict = encoding.decodeDict(this.conn, result.value).entries;").to_string()
+                    format!("const dict = encoding.decodeDict(conn, result.value).entries;").to_string()
+                },
+                original::Code::Enumeration => {
+                    format!("const enumValue: {} = encoding.decodeVarint64(conn, result.value).toNumber(); ", return_type_signature(&Some(return_type.clone()))).to_string()
                 },
                 _ => "".to_string(),
             }
@@ -401,7 +404,7 @@ fn return_type_signature(return_type: &Option<original::ReturnType>) -> String {
                 original::Code::Double => "number".to_string(),
                 original::Code::Sint32 => "number".to_string(),
                 original::Code::Uint32 => "number".to_string(),
-                original::Code::Enumeration => "void /*enum*/".to_string(),
+                original::Code::Enumeration => return_type.name.clone().unwrap(),
                 original::Code::List => {
                     let types = (&return_type.types).clone().unwrap();
                     let list_type = types.get(0).unwrap().clone();
