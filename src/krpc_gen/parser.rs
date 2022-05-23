@@ -384,18 +384,6 @@ fn before_return(return_type: &Option<ReturnType>) -> String {
     }
 }
 
-fn get_list_type(types: &Vec<original::ReturnType>) -> String {
-    let list_type = types.get(0).unwrap();
-    match list_type.code {
-        original::Code::String => "string".to_string(),
-        original::Code::Class => {
-            list_type.name.clone().unwrap()
-        },
-        _ => "void /*list*/".to_string()
-    }
-}
-
-
 fn return_type_signature(return_type: &Option<original::ReturnType>) -> String {
     match return_type {
         Some(return_type) => {
@@ -409,8 +397,8 @@ fn return_type_signature(return_type: &Option<original::ReturnType>) -> String {
                 original::Code::Enumeration => "void /*enum*/".to_string(),
                 original::Code::List => {
                     let types = (&return_type.types).clone().unwrap();
-                    let list_type_string = get_list_type(&types);
-                    format!("{}[]", list_type_string).to_string()
+                    let list_type = types.get(0).unwrap().clone();
+                    format!("{}[]", return_type_signature(&Some(list_type))).to_string()
                 },
                 original::Code::Dictionary => {
                     let types = return_type.types.clone().unwrap();

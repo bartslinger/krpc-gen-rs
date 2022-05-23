@@ -101,6 +101,7 @@ export class {{{ class.name }}} {
   }
 
   {{#each class.methods as |method|}}
+
   async {{{ method.name }}}({{{ method.arguments_signature }}}): Promise<{{{ method.return_type_signature }}}> {
     {{#if method.arguments }}
     const args = [
@@ -129,7 +130,10 @@ export class {{{ class.name }}} {
         });
       }
     );
-    return {{{ decoder_function }}}(this.conn, result);
+    {{#if before_return }}
+    {{{ before_return }}}
+    {{/if}}
+    return {{{ decoder_function }}};
   }
 
   {{/each}}
