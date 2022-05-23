@@ -341,13 +341,15 @@ fn decoder_function(return_type: &Option<ReturnType>, input: String) -> String {
                     let list_item_decoder_function = decoder_function(&Some(list_item_type.clone()), "item".to_string());
                     format!("list.map((item) => {{ return {}}})", list_item_decoder_function).to_string()
                 },
+                original::Code::Set => {
+                    "set".to_string()
+                },
                 original::Code::Dictionary => {
                     let types = (&return_type.types).clone().unwrap();
                     let key_type = types.get(0).unwrap().clone();
                     let value_type = types.get(1).unwrap().clone();
                     format!("dict.reduce((obj: {}, item) => {{ const key = {}; const value = {}; obj[key] = value; return obj;}}, {{}})", return_type_signature(&Some(return_type.clone())), decoder_function(&Some(key_type), "item.key".to_string()), decoder_function(&Some(value_type), "item.value".to_string())).to_string()
                 },
-                original::Code::Set => format!("encoding.decodeSet(this.conn, {})", input).to_string(),
                 original::Code::Tuple => {
                     let types = (&return_type.types).clone().unwrap();
                     let test: Vec<String> = types.into_iter().enumerate()
@@ -371,6 +373,11 @@ fn before_return(return_type: &Option<ReturnType>) -> String {
                 original::Code::List => {
                     format!("const list = encoding.decodeList(this.conn, result.value).items;").to_string()
                 }
+                original::Code::Set => {
+                    let types = (&return_type.types).clone().unwrap();
+                    let set_type = types.get(0).unwrap().clone();
+                    format!("const set: {} = new Set(); encoding.decodeSet(this.conn, result.value).items.forEach((item) => {{ set.add({});}});", return_type_signature(&Some(return_type.clone())), decoder_function(&Some(set_type), "item".to_string())).to_string()
+                },
                 original::Code::Tuple => {
                     format!("const tuple = encoding.decodeTuple(this.conn, result.value).items;").to_string()
                 },
@@ -407,7 +414,11 @@ fn return_type_signature(return_type: &Option<original::ReturnType>) -> String {
                     let value_type = types.get(1).unwrap().clone();
                     format!("Record<{}, {}>", return_type_signature(&Some(key_type)), return_type_signature(&Some(value_type))).to_string()
                 },
-                original::Code::Set => "void /*set*/".to_string(),
+                original::Code::Set => {
+                    let types = (&return_type.types).clone().unwrap();
+                    let list_type = types.get(0).unwrap().clone();
+                    format!("Set<{}>", return_type_signature(&Some(list_type))).to_string()
+                },
                 original::Code::Tuple => {
                     let types = return_type.types.clone().unwrap();
                     let tuple_type: Vec<String> = types.into_iter()
