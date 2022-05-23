@@ -66,7 +66,7 @@ impl ParsedMethod for ClassProperty {
         self.procedure.clone()
     }
     fn function_name(&self) -> String {
-        self.prefix.clone() + self.property.to_case(Case::Camel).as_str()
+        self.prefix.clone() + self.property.to_case(Case::UpperCamel).as_str()
     }
 }
 
@@ -305,7 +305,7 @@ fn convert_single_argument(parameter: &original::Parameter, position: u64) -> ou
         original::Code::Double => "encoding.encodeDouble".to_string(),
         original::Code::Sint32 => "encoding.encodeSint32".to_string(),
         original::Code::Uint32 => "encoding.encodeUint32".to_string(),
-        original::Code::Enumeration => "encoding.encodeEnum".to_string(),
+        original::Code::Enumeration => "encoding.encodeVarint64".to_string(),
         original::Code::List => "encoding.encodeList".to_string(),
         original::Code::Dictionary => "encoding.encodeDict".to_string(),
         original::Code::Set => "encoding.encodeSet".to_string(),
@@ -314,7 +314,7 @@ fn convert_single_argument(parameter: &original::Parameter, position: u64) -> ou
     };
     let value = match parameter.r#type.code {
         original::Code::Class => parameter.name.to_case(Case::Camel) + ".id",
-        original::Code::Enumeration => parameter.name.to_case(Case::Camel) + " as u64",
+        original::Code::Enumeration => format!("Long.fromInt({}.valueOf())", parameter.name.to_case(Case::Camel)),
         _ => parameter.name.to_case(Case::Camel),
     };
     output::Argument {

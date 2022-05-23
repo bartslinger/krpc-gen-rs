@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // Generated file DO NOT EDIT
 import Long from "long";
 import { KRPCConnection } from "../../services/connection";
@@ -6,6 +7,14 @@ import * as encoding from "../../services/encoding";
 import ByteBuffer from "bytebuffer";
 ByteBuffer.DEFAULT_ENDIAN = true;
 
+{{#each enumerations as |enumeration| }}
+enum {{{enumeration.name}}} {
+  {{#each enumeration.values as |value|}}
+  {{{value.name}}} = {{{ value.id }}},
+  {{/each}}    
+}
+
+{{/each}}
 export class {{{ service_name }}} {
   private conn: KRPCConnection;
   constructor(conn: KRPCConnection) {
@@ -137,8 +146,45 @@ export class {{{ class.name }}} {
   }
 
   {{/each}}
+
+  {{#each class.getters_setters as |method| }}
+  async {{{ method.name }}}({{{ method.arguments_signature }}}): Promise<{{{ method.return_type_signature }}}> {
+    {{#if method.arguments }}
+    const args = [
+    {{#each method.arguments as |argument|}}
+      {
+        position: {{{ argument.position }}},
+        value: {{{ argument.encoder_function }}}({{{ argument.value }}}),
+      },
+    {{/each}}
+    ];
+    {{else}}
+    const args: Array<krpc.Argument> = [];
+    {{/if}}
+    const procedureCall = krpc.ProcedureCall.fromPartial({
+      service: "{{{ ../service_name }}}",
+      procedure: "{{{ procedure }}}",
+      arguments: args,
+    });
+    // eslint-disable-next-line no-unused-vars
+    const result = await new Promise<krpc.ProcedureResult>(
+      (resolve, reject) => {
+        this.conn.scheduleProcedureCall({
+          procedureCall,
+          resolve,
+          reject,
+        });
+      }
+    );
+    {{{ before_return }}}
+    return {{{ decoder_function }}};
+  }
+
+  {{/each}}
 }
 {{/each}}
+
+
 {{!-- impl<'a> {{{ service_name }}}<'a> {
     {{/each}}
 }
