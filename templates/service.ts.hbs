@@ -31,32 +31,7 @@ export class {{{ service_name }}} {
       procedure: "{{{ procedure }}}",
       arguments: args,
     });
-    const result = await new Promise<krpc.ProcedureResult>(
-      (resolve, reject) => {
-        this.conn.scheduleProcedureCall({
-          procedureCall,
-          resolve,
-          reject
-        });
-      }
-    );
-    return {{{ decoder_function }}};
-  }
-
-  {{/each}}
-
-  {{#each service_getters_setters as |method|}}
-  async {{{ method.name }}}({{{ method.arguments_signature }}}): Promise<{{{ method.return_type_signature }}}> {
-    const args: Array<krpc.Argument> = [];
-    {{#each method.arguments as |argument|}}
-    // {{{ argument.value}}}
-    args.push({{{ argument.encoder_function }}}({{{ argument.value }}}));
-    {{/each}}
-    const procedureCall = krpc.ProcedureCall.fromPartial({
-      service: "{{{ ../service_name }}}",
-      procedure: "{{{ procedure }}}",
-      arguments: args,
-    });
+    // eslint-disable-next-line no-unused-vars
     const result = await new Promise<krpc.ProcedureResult>(
       (resolve, reject) => {
         this.conn.scheduleProcedureCall({
@@ -66,6 +41,44 @@ export class {{{ service_name }}} {
         });
       }
     );
+    {{#if before_return }}
+    {{{ before_return }}}
+    {{/if}}
+    return {{{ decoder_function }}};
+  }
+
+  {{/each}}
+
+  {{#each service_getters_setters as |method|}}
+  async {{{ method.name }}}({{{ method.arguments_signature }}}): Promise<{{{ method.return_type_signature }}}> {
+    {{#if method.arguments }}
+    const args = [
+    {{#each method.arguments as |argument|}}
+      {
+        position: {{{ argument.position }}},
+        value: {{{ argument.encoder_function }}}({{{ argument.value }}}),
+      },
+    {{/each}}
+    ];
+    {{else}}
+    const args: Array<krpc.Argument> = [];
+    {{/if}}
+    const procedureCall = krpc.ProcedureCall.fromPartial({
+      service: "{{{ ../service_name }}}",
+      procedure: "{{{ procedure }}}",
+      arguments: args,
+    });
+    // eslint-disable-next-line no-unused-vars
+    const result = await new Promise<krpc.ProcedureResult>(
+      (resolve, reject) => {
+        this.conn.scheduleProcedureCall({
+          procedureCall,
+          resolve,
+          reject,
+        });
+      }
+    );
+    {{{ before_return }}}
     return {{{ decoder_function }}};
   }
 
@@ -84,7 +97,7 @@ export class {{{ class.name }}} {
 
   static decode(conn: KRPCConnection, result: Uint8Array) {
     const bb = ByteBuffer.wrap(result);
-    return new {{{ class.name }}}(conn, bb.readVarint64();
+    return new {{{ class.name }}}(conn, bb.readVarint64());
   }
 
   {{#each class.methods as |method|}}
@@ -106,12 +119,13 @@ export class {{{ class.name }}} {
       procedure: "{{{ procedure }}}",
       arguments: args,
     });
+    // eslint-disable-next-line no-unused-vars
     const result = await new Promise<krpc.ProcedureResult>(
       (resolve, reject) => {
         this.conn.scheduleProcedureCall({
           procedureCall,
           resolve,
-          reject
+          reject,
         });
       }
     );

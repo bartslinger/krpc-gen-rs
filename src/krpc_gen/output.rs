@@ -44,6 +44,7 @@ pub struct Method {
     pub arguments_signature: String,
     pub arguments: Vec<Argument>,
     pub decoder_function: String,
+    pub before_return: String,
     pub return_type_signature: String,
     pub return_value: String,
 }

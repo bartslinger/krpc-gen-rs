@@ -238,7 +238,8 @@ fn convert_method(property: &impl ParsedMethod, procedure: &original::Procedure,
         name: property.function_name(),
         arguments_signature: arguments_signature(&procedure, is_static),
         arguments: convert_arguments(&procedure),
-        decoder_function: decoder_function(&procedure.return_type),
+        decoder_function: decoder_function(&procedure.return_type, "result.value".to_string()),
+        before_return: before_return(&procedure.return_type),
         return_type_signature: return_type_signature(&procedure.return_type),
         return_value: return_value(&procedure, is_static),
     }
@@ -293,8 +294,8 @@ fn convert_single_argument(parameter: &original::Parameter, position: u64) -> ou
     if parameter.name == "this" {
         return output::Argument {
             position: 0,
-            encoder_function: "encoding.encode_u64".to_string(),
-            value: "self.id".to_string(),
+            encoder_function: "encoding.encodeVarint64".to_string(),
+            value: "this.id".to_string(),
         };
     }
     let encoder_function = match parameter.r#type.code {
@@ -323,32 +324,63 @@ fn convert_single_argument(parameter: &original::Parameter, position: u64) -> ou
     }
 }
 
-fn decoder_function(return_type: &Option<ReturnType>) -> String {
+fn decoder_function(return_type: &Option<ReturnType>, input: String) -> String {
     match return_type {
         Some(return_type) => {
             match &return_type.code {
-                original::Code::String => "encoding.decodeString(this.conn, result.value)".to_string(),
-                original::Code::Bool => "encoding.decodeBool(this.conn, result.value)".to_string(),
-                original::Code::Float => "encoding.decodeFloat(this.conn, result.value)".to_string(),
-                original::Code::Double => "encoding.decodeDouble(this.conn, result.value)".to_string(),
-                original::Code::Sint32 => "encoding.decodeSint32(this.conn, result.value)".to_string(),
-                original::Code::Uint32 => "encoding.decodeUint32(this.conn, result.value)".to_string(),
-                original::Code::Enumeration => "encoding.decodeEnum(this.conn, result.value)".to_string(),
+                original::Code::String => format!("encoding.decodeString(this.conn, {})", input).to_string(),
+                original::Code::Bool => format!("encoding.decodeBool(this.conn, {})", input).to_string(),
+                original::Code::Float => format!("encoding.decodeFloat(this.conn, {})", input).to_string(),
+                original::Code::Double => format!("encoding.decodeDouble(this.conn, {})", input).to_string(),
+                original::Code::Sint32 => format!("encoding.decodeSint32(this.conn, {})", input).to_string(),
+                original::Code::Uint32 => format!("encoding.decodeUint32(this.conn, {})", input).to_string(),
+                original::Code::Enumeration => format!("encoding.decodeEnum(this.conn, {})", input).to_string(),
                 original::Code::List => {
                     let types = (&return_type.types).clone().unwrap();
                     let list_item_type = types.get(0).unwrap();
-                    let list_item_decoder_function = decoder_function(&Some(list_item_type.clone()));
-                    format!("encoding.decodeList(this.conn, result.value).items.map((item) => {{ return {}}})", list_item_decoder_function).to_string()
+                    let list_item_decoder_function = decoder_function(&Some(list_item_type.clone()), "item".to_string());
+                    format!("list.map((item) => {{ return {}}})", list_item_decoder_function).to_string()
                 },
-                original::Code::Dictionary => "encoding.decodeDict(this.conn, result.value)".to_string(),
-                original::Code::Set => "encoding.decodeSet(this.conn, result.value)".to_string(),
-                original::Code::Tuple => "encoding.decodeTuple(this.conn, result.value)".to_string(),
+                original::Code::Dictionary => {
+                    let types = (&return_type.types).clone().unwrap();
+                    let key_type = types.get(0).unwrap().clone();
+                    let value_type = types.get(1).unwrap().clone();
+                    format!("dict.reduce((obj: {}, item) => {{ const key = {}; const value = {}; obj[key] = value; return obj;}}, {{}})", return_type_signature(&Some(return_type.clone())), decoder_function(&Some(key_type), "item.key".to_string()), decoder_function(&Some(value_type), "item.value".to_string())).to_string()
+                },
+                original::Code::Set => format!("encoding.decodeSet(this.conn, {})", input).to_string(),
+                original::Code::Tuple => {
+                    let types = (&return_type.types).clone().unwrap();
+                    let test: Vec<String> = types.into_iter().enumerate()
+                        .map(|x| decoder_function(&Some(x.1), format!("tuple[{}]", x.0).to_string()))
+                        .collect();
+                    format!("[{}]", test.join(", ")).to_string()
+                },
                 original::Code::Class => {
-                    format!("{}.decode(this.conn, result)", &return_type.name.clone().unwrap()).to_string()
+                    format!("{}.decode(this.conn, {})", &return_type.name.clone().unwrap(), input).to_string()
                 },
             }
         },
         None => "undefined".to_string()
+    }
+}
+
+fn before_return(return_type: &Option<ReturnType>) -> String {
+    match return_type {
+        Some(return_type) => {
+            match &return_type.code {
+                original::Code::List => {
+                    format!("const list = encoding.decodeList(this.conn, result.value).items;").to_string()
+                }
+                original::Code::Tuple => {
+                    format!("const tuple = encoding.decodeTuple(this.conn, result.value).items;").to_string()
+                },
+                original::Code::Dictionary => {
+                    format!("const dict = encoding.decodeDict(this.conn, result.value).entries;").to_string()
+                },
+                _ => "".to_string(),
+            }
+        },
+        None => "".to_string()
     }
 }
 
@@ -380,7 +412,13 @@ fn return_type_signature(return_type: &Option<original::ReturnType>) -> String {
                     let list_type_string = get_list_type(&types);
                     format!("{}[]", list_type_string).to_string()
                 },
-                original::Code::Dictionary => "void /*dict*/".to_string(),
+                original::Code::Dictionary => {
+                    let types = return_type.types.clone().unwrap();
+                    // first one is always a string apparently
+                    let key_type = types.get(0).unwrap().clone();
+                    let value_type = types.get(1).unwrap().clone();
+                    format!("Record<{}, {}>", return_type_signature(&Some(key_type)), return_type_signature(&Some(value_type))).to_string()
+                },
                 original::Code::Set => "void /*set*/".to_string(),
                 original::Code::Tuple => {
                     let types = return_type.types.clone().unwrap();
