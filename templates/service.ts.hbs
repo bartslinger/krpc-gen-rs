@@ -8,7 +8,7 @@ import ByteBuffer from "bytebuffer";
 ByteBuffer.DEFAULT_ENDIAN = true;
 
 {{#each enumerations as |enumeration| }}
-enum {{{enumeration.name}}} {
+export enum {{{enumeration.name}}} {
   {{#each enumeration.values as |value|}}
   {{{value.name}}} = {{{ value.id }}},
   {{/each}}    
