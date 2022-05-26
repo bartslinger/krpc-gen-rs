@@ -317,7 +317,7 @@ fn convert_single_argument(parameter: &original::Parameter, position: u64) -> ou
         original::Code::Double => "encoding.encodeDouble".to_string(),
         original::Code::Sint32 => "encoding.encodeSint32".to_string(),
         original::Code::Uint32 => "encoding.encodeUint32".to_string(),
-        original::Code::Enumeration => "encoding.encodeVarint64".to_string(),
+        original::Code::Enumeration => "encoding.encodeSint32".to_string(),
         original::Code::List => "encoding.encodeList".to_string(),
         original::Code::Dictionary => "encoding.encodeDict".to_string(),
         original::Code::Set => "encoding.encodeSet".to_string(),
@@ -326,7 +326,7 @@ fn convert_single_argument(parameter: &original::Parameter, position: u64) -> ou
     };
     let value = match parameter.r#type.code {
         original::Code::Class => parameter.name.to_case(Case::Camel) + ".id",
-        original::Code::Enumeration => format!("Long.fromInt({}.valueOf())", parameter.name.to_case(Case::Camel)),
+        original::Code::Enumeration => format!("{}", parameter.name.to_case(Case::Camel)),
         _ => parameter.name.to_case(Case::Camel),
     };
     output::Argument {
@@ -402,7 +402,7 @@ fn before_return(return_type: &Option<ReturnType>) -> String {
                     format!("const dict = encoding.decodeDict(conn, result.value).entries;").to_string()
                 },
                 original::Code::Enumeration => {
-                    format!("const enumValue: {} = encoding.decodeVarint64(conn, result.value).toNumber(); ", return_type_signature(&Some(return_type.clone()))).to_string()
+                    format!("const enumValue: {} = encoding.decodeSint32(conn, result.value); ", return_type_signature(&Some(return_type.clone()))).to_string()
                 },
                 _ => "".to_string(),
             }
